@@ -1,0 +1,30 @@
+[
+    {
+        "id": "python_variable",
+        "description": "Initialize a variable named <code>power</code> with the value <code>100</code>.",
+        "snippet": "power = 100",
+        "validate": "power == 100",
+        "hint": "Try: power = 100"
+    },
+    {
+        "id": "python_list_append",
+        "description": "Create a list named <code>support</code> and append the string <code>'life'</code> to it.",
+        "snippet": "support = []\nsupport.append('life')",
+        "validate": "isinstance(support, list) and 'life' in support",
+        "hint": "Use support.append('life')"
+    },
+    {
+        "id": "python_function",
+        "description": "Define a function <code>add(a, b)</code> that returns the sum of <code>a</code> and <code>b</code>.",
+        "snippet": "def add(a, b):\n    return a + b",
+        "validate": "callable(add) and add(10, 20) == 30",
+        "hint": "Use 'def add(a, b):' and 'return a + b'"
+    },
+    {
+        "id": "python_fstring",
+        "description": "Create a variable <code>msg</code> using an f-string that contains the word <code>'Safe'</code>.",
+        "snippet": "status = 'Safe'\nmsg = f'System is {status}'",
+        "validate": "'Safe' in msg",
+        "hint": "Try: msg = f'System is {status}'"
+    }
+]

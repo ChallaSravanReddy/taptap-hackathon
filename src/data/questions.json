@@ -1,0 +1,112 @@
+[
+  {
+    "question": "What is the output of: print(2 + 3 * 2)",
+    "options": ["10", "8", "12", "6"],
+    "correct": 1
+  },
+  {
+    "question": "Which Git command uploads code to GitHub?",
+    "options": ["git add", "git commit", "git push", "git clone"],
+    "correct": 2
+  },
+  {
+    "question": "Which command shows MongoDB databases?",
+    "options": ["show dbs", "show tables", "list db", "show collections"],
+    "correct": 0
+  },
+  {
+    "question": "What does HTML stand for?",
+    "options": ["HyperText Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlink and Text Markup Language"],
+    "correct": 0
+  },
+  {
+    "question": "In Python, what is a list?",
+    "options": ["A function", "A data structure that holds multiple items", "A loop", "A variable type"],
+    "correct": 1
+  },
+  {
+    "question": "Which Git command stages all changes?",
+    "options": ["git commit", "git push", "git add .", "git status"],
+    "correct": 2
+  },
+  {
+    "question": "In MongoDB, which method inserts a document?",
+    "options": ["db.collection.find()", "db.collection.update()", "db.collection.insertOne()", "db.collection.delete()"],
+    "correct": 2
+  },
+  {
+    "question": "What is an algorithm?",
+    "options": ["A programming language", "A set of step-by-step instructions", "A database", "A web server"],
+    "correct": 1
+  },
+  {
+    "question": "In CSS, what does 'color' property change?",
+    "options": ["Font size", "Text color", "Background", "Border"],
+    "correct": 1
+  },
+  {
+    "question": "Which CSS property is used to create space around elements, outside of any defined borders?",
+    "options": ["padding", "margin", "spacing", "border-spacing"],
+    "correct": 1
+  },
+  {
+    "question": "What is the purpose of a function in programming?",
+    "options": ["To store data", "To perform a specific task", "To create loops", "To define variables"],
+    "correct": 1
+  },
+  {
+    "question": "Which HTML tag is used for creating a hyperlink?",
+    "options": ["<link>", "<a>", "<href>", "<url>"],
+    "correct": 1
+  },
+  {
+    "question": "In Git, what does 'git pull' do?",
+    "options": ["Uploads changes", "Downloads and merges changes", "Deletes repository", "Creates a branch"],
+    "correct": 1
+  },
+  {
+    "question": "What is a variable in programming?",
+    "options": ["A fixed value", "A container for storing data", "A type of loop", "A function call"],
+    "correct": 1
+  },
+  {
+    "question": "Which CSS property is used to change the font size?",
+    "options": ["font-color", "font-size", "text-size", "size"],
+    "correct": 1
+  },
+  {
+    "question": "In MongoDB, what is a collection?",
+    "options": ["A single document", "A group of documents", "A database", "A query"],
+    "correct": 1
+  },
+  {
+    "question": "What does 'if' statement do in Python?",
+    "options": ["Creates a loop", "Executes code conditionally", "Defines a function", "Imports modules"],
+    "correct": 1
+  },
+  {
+    "question": "Which Git command shows the status of the repository?",
+    "options": ["git log", "git status", "git diff", "git branch"],
+    "correct": 1
+  },
+  {
+    "question": "What is the output of: print('Hello' + 'World')",
+    "options": ["HelloWorld", "Hello World", "Error", "Hello+World"],
+    "correct": 0
+  },
+  {
+    "question": "In web development, what does API stand for?",
+    "options": ["Application Programming Interface", "Advanced Programming Interface", "Automated Program Integration", "Application Process Interface"],
+    "correct": 0
+  },
+  {
+    "question": "Which Python keyword is used to define a function?",
+    "options": ["func", "define", "def", "function"],
+    "correct": 2
+  },
+  {
+    "question": "In JavaScript, how do you declare a constant variable?",
+    "options": ["var", "let", "const", "constant"],
+    "correct": 2
+  }
+]
