@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Timer, Target, Zap, ChevronRight, Info } from 'lucide-react';
+import { Shield, Timer, Target, Zap, ChevronRight, Info, RotateCcw } from 'lucide-react';
 import questionsData from '../data/questions.json';
 
 const MazeMode = ({ onGameOver, onVictory, onIntensityChange }) => {
