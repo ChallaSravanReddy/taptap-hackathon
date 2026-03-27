@@ -79,7 +79,8 @@ const App = () => {
   };
 
   return (
-    <div className={shake ? 'screen-shake' : ''} style={{ minHeight: '100vh' }}>
+    <div className={shake ? 'screen-shake' : ''} style={{ minHeight: '100vh', position: 'relative' }}>
+      <div className="crt-overlay" />
       <Stars />
       <Glitch active={shake} />
 
@@ -119,116 +120,130 @@ const StartScreen = ({ onStart }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.05 }}
+      initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, filter: 'blur(10px)' }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 5 }}
     >
-      <div style={{ maxWidth: 800, width: '100%', textAlign: 'center' }}>
+      <div style={{ maxWidth: 900, width: '100%', textAlign: 'center' }}>
 
         {/* Badge */}
         <motion.div
-          initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}
+          initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2, type: 'spring' }}
           style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '6px 18px', borderRadius: 99,
-            background: 'rgba(0,240,255,0.07)', border: '1px solid rgba(0,240,255,0.2)',
-            marginBottom: '2rem'
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            padding: '8px 24px', borderRadius: 0,
+            background: 'linear-gradient(90deg, rgba(0,240,255,0.02), rgba(0,240,255,0.1) 50%, rgba(0,240,255,0.02))', 
+            borderTop: '1px solid rgba(0,240,255,0.3)', borderBottom: '1px solid rgba(0,240,255,0.3)',
+            marginBottom: '2rem', backdropFilter: 'blur(4px)'
           }}
         >
-          <Triangle size={10} fill="rgba(0,240,255,0.8)" style={{ color: 'transparent' }} />
+          <Triangle size={12} fill="var(--cyan)" style={{ color: 'transparent', filter: 'drop-shadow(0 0 4px var(--cyan))' }} />
           <span className="hud-label" style={{ color: 'var(--cyan)' }}>Neural Interface Active — v2.1.0</span>
-          <Triangle size={10} fill="rgba(0,240,255,0.8)" style={{ color: 'transparent', transform: 'rotate(180deg)' }} />
+          <Triangle size={12} fill="var(--cyan)" style={{ color: 'transparent', transform: 'rotate(180deg)', filter: 'drop-shadow(0 0 4px var(--cyan))' }} />
         </motion.div>
 
         {/* Title */}
         <motion.h1
-          initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+          initial={{ y: 40, opacity: 0, filter: 'blur(20px)' }} animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }} transition={{ delay: 0.3, duration: 0.8 }}
+          className="text-gradient"
           style={{
             fontFamily: 'var(--font-hud)',
-            fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+            fontSize: 'clamp(4rem, 12vw, 8rem)',
             fontWeight: 900,
-            lineHeight: 0.9,
-            letterSpacing: '-0.02em',
-            marginBottom: '1rem',
-            background: 'linear-gradient(180deg, #fff 30%, rgba(0,240,255,0.5) 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            lineHeight: 0.85,
+            letterSpacing: '-0.03em',
+            marginBottom: '1.5rem',
+            position: 'relative'
           }}
         >
           CODE<br />RUNNER
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-          style={{ color: 'var(--dim)', fontSize: '1rem', maxWidth: 440, margin: '0 auto 3.5rem', lineHeight: 1.7 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+          style={{ color: 'var(--text)', fontSize: '1.1rem', maxWidth: 500, margin: '0 auto 4rem', lineHeight: 1.8, textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}
         >
-          Deploy Python scripts, solve logic sequences, and maintain core stability in a high-fidelity digital battlefield.
+          Deploy script executions, bypass logic firewalls, and maintain system stability in a high-fidelity tactical environment.
         </motion.p>
 
         {/* Mode Cards */}
         <motion.div
-          initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.45 }}
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '3rem' }}
+          initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7, duration: 0.6 }}
+          className="grid-2col"
+          style={{ marginBottom: '4rem', perspective: '1200px' }}
         >
           {[
             {
-              id: 'maze', icon: <Play size={28} />, label: 'Maze Escape',
-              sub: '30s per challenge · 10 levels · Multiple choice', color: 'var(--cyan)'
+              id: 'maze', icon: <Play size={32} strokeWidth={1.5} />, label: 'Maze Escape',
+              sub: '30s / Node · Logic Sequences', color: 'var(--cyan)'
             },
             {
-              id: 'survival', icon: <Zap size={28} />, label: 'Python Survival',
-              sub: '10 min endurance · Type real Python · Live execution', color: 'var(--purple)'
+              id: 'survival', icon: <Zap size={32} strokeWidth={1.5} />, label: 'Endurance',
+              sub: 'Live Python · Core Life Support', color: 'var(--blue)'
             }
           ].map(m => (
             <motion.button
               key={m.id}
               onHoverStart={() => setHover(m.id)}
               onHoverEnd={() => setHover(null)}
-              whileHover={{ y: -6 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02, rotateX: 2, rotateY: m.id === 'maze' ? -2 : 2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => onStart(m.id)}
               style={{
-                background: hover === m.id ? `rgba(${m.id === 'maze' ? '0,240,255' : '168,85,247'},0.08)` : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${hover === m.id ? (m.id === 'maze' ? 'rgba(0,240,255,0.35)' : 'rgba(168,85,247,0.35)') : 'rgba(255,255,255,0.07)'}`,
-                borderRadius: '1.25rem',
-                padding: '2rem',
+                background: hover === m.id ? `linear-gradient(135deg, rgba(15,23,42,0.8) 0%, rgba(30,58,138,0.4) 100%)` : 'rgba(15,23,42,0.6)',
+                border: '1px solid',
+                borderColor: hover === m.id ? m.color : 'rgba(255,255,255,0.1)',
+                clipPath: 'polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)',
+                padding: '2.5rem 2rem',
                 textAlign: 'left',
-                transition: 'all 0.25s ease',
-                boxShadow: hover === m.id ? `0 20px 50px ${m.id === 'maze' ? 'rgba(0,240,255,0.1)' : 'rgba(168,85,247,0.1)'}` : 'none',
+                backdropFilter: 'blur(20px)',
+                transition: 'border-color 0.3s, box-shadow 0.3s',
+                boxShadow: hover === m.id ? `0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px ${m.color}20, 0 0 30px ${m.color}40` : '0 10px 30px rgba(0,0,0,0.5)',
                 position: 'relative', overflow: 'hidden'
               }}
             >
-              <div style={{ color: m.color, marginBottom: '1rem' }}>{m.icon}</div>
-              <div style={{ fontFamily: 'var(--font-hud)', fontSize: '1rem', fontWeight: 700, marginBottom: '0.5rem', color: '#fff' }}>
+              {/* Scanline overlay on hover */}
+              <AnimatePresence>
+                {hover === m.id && (
+                  <motion.div
+                    initial={{ top: '-10%' }} animate={{ top: '110%' }} exit={{ opacity: 0 }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                    style={{ position: 'absolute', left: 0, width: '100%', height: '2px', background: m.color, opacity: 0.5, boxShadow: `0 0 10px ${m.color}` }}
+                  />
+                )}
+              </AnimatePresence>
+
+              <div style={{ color: m.color, marginBottom: '1.25rem', filter: `drop-shadow(0 0 8px ${m.color})` }}>{m.icon}</div>
+              <div style={{ fontFamily: 'var(--font-hud)', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '0.1em', marginBottom: '0.5rem', color: '#fff', textTransform: 'uppercase' }}>
                 {m.label}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--dim)', lineHeight: 1.6 }}>{m.sub}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--dim)', lineHeight: 1.6, fontFamily: 'var(--font-mono)' }}>{m.sub}</div>
               
               {/* Arrow */}
-              <div style={{ position: 'absolute', bottom: '1.5rem', right: '1.5rem', color: m.color, opacity: hover === m.id ? 1 : 0.3, transition: 'opacity 0.2s' }}>
-                <ChevronRight size={20} />
+              <div style={{ position: 'absolute', bottom: '2rem', right: '2rem', color: m.color, opacity: hover === m.id ? 1 : 0.3, transition: 'opacity 0.3s', transform: hover === m.id ? 'translateX(5px)' : 'none' }}>
+                <ChevronRight size={24} />
               </div>
 
-              {/* Glow corner */}
-              <div style={{
-                position: 'absolute', top: 0, right: 0,
-                width: 80, height: 80,
-                background: `radial-gradient(circle at top right, ${m.color}20, transparent)`,
-                pointerEvents: 'none'
-              }} />
+              {/* Angle accent corner */}
+              <div style={{ position: 'absolute', top: 0, right: 0, width: 40, height: 40, borderRight: `2px solid ${m.color}`, borderTop: `2px solid ${m.color}`, opacity: hover === m.id ? 1 : 0.1, transform: 'translate(-10px, 10px)' }} />
             </motion.button>
           ))}
         </motion.div>
 
         {/* Tech tags */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          {['Python 3', 'Brython Engine', 'React 19', 'Framer Motion'].map(t => (
+        <motion.div 
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+          className="mobile-hidden"
+          style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}
+        >
+          {['SYS.CORE 3.1', 'R-ENGINE', 'BRY-COMPILER', 'FMX-RENDER'].map(t => (
             <span key={t} style={{
               fontFamily: 'var(--font-mono)', fontSize: '0.65rem',
-              color: 'var(--dim)', padding: '4px 12px',
-              border: '1px solid var(--border)', borderRadius: 99
+              color: 'var(--cyan)', opacity: 0.6, padding: '4px 12px',
+              border: '1px solid rgba(0,240,255,0.2)', background: 'rgba(0,240,255,0.03)',
+              clipPath: 'polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)'
             }}>{t}</span>
           ))}
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );
