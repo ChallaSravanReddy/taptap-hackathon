@@ -15,6 +15,7 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
     const [isEngineReady, setIsEngineReady] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const [isCompiling, setIsCompiling] = useState(false);
+    const [isLevelComplete, setIsLevelComplete] = useState(false);
 
     useEffect(() => {
         setChallenges([...challengesData].sort(() => Math.random() - 0.5));
@@ -30,13 +31,13 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
     }, []);
 
     useEffect(() => {
-        if (timer > 0) {
+        if (timer > 0 && !isLevelComplete) {
             const id = setInterval(() => setTimer(t => t - 1), 1000);
             return () => clearInterval(id);
-        } else {
+        } else if (timer <= 0) {
             onGameOver(Math.round((timer / 600) * 100));
         }
-    }, [timer]);
+    }, [timer, isLevelComplete]);
 
     const runCode = async () => {
         if (!isEngineReady || isScanning) return;
@@ -62,7 +63,7 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
             setOutputType('success');
             setOutput(`SUCCESS: ${result.message} // CORE_STABILIZED`);
             setTimer(t => Math.min(t + 45, 600));
-            setTimeout(nextChallenge, 2500);
+            setIsLevelComplete(true);
         } else {
             setOutputType('error');
             setOutput(`FATAL_ERROR: ${result.message} // INTEGRITY_CRITICAL`);
@@ -72,6 +73,7 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
     };
 
     const nextChallenge = () => {
+        setIsLevelComplete(false);
         setOutputType('info');
         setOutput('SEQUENCER_RELOADED // READY');
         setCode('');
@@ -198,24 +200,53 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
 
                         <div style={{ flex: 1, position: 'relative', background: 'rgba(2,6,23,0.8)', borderRadius: 0, border: '1px solid rgba(0,240,255,0.1)', overflow: 'hidden', boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)' }}>
                             <div className="crt-overlay" style={{ opacity: 0.15 }} />
-                            {isScanning && <div className="scanline" style={{ top: '0%', animation: 'scanMove 2s linear infinite', height: '10vh' }} />}
-                            <textarea
-                                value={code}
-                                onChange={(e) => setCode(e.target.value)}
-                                spellCheck="false"
-                                className="mono"
-                                style={{
-                                    width: '100%', height: '100%', padding: '1.5rem',
-                                    background: 'transparent', color: '#38bdf8', // Brighter cyan for code
-                                    border: 'none', outline: 'none', resize: 'none',
-                                    fontSize: '0.95rem', lineHeight: '1.7',
-                                    opacity: isScanning ? 0.6 : 1, transition: 'opacity 0.2s',
-                                    textShadow: '0 0 5px rgba(56,189,248,0.5)',
-                                    position: 'relative', zIndex: 5
-                                }}
-                                placeholder="# Initialize Python Script..."
-                            />
-                            <div style={{ position: 'absolute', bottom: 12, right: 12, opacity: 0.2, color: 'var(--cyan)' }}>
+                            
+                            <AnimatePresence>
+                                {isLevelComplete && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 1.05 }}
+                                        style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(12px)', zIndex: 10, padding: '2rem', textAlign: 'center' }}
+                                    >
+                                        <div className="hud-label" style={{ color: 'var(--green)', fontSize: '1.2rem', marginBottom: '1rem', textShadow: '0 0 10px rgba(16,185,129,0.8)' }}>SEQUENCE VALIDATED</div>
+                                        <h2 style={{ fontSize: '2.5rem', fontWeight: 700, color: '#fff', marginBottom: '2.5rem', textShadow: '0 0 30px rgba(0,255,170,0.5)' }}>NODE COMPLETED</h2>
+                                        <motion.button 
+                                            className="g-btn-primary"
+                                            whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(16,185,129,0.6)' }}
+                                            whileTap={{ scale: 0.95 }}
+                                            onClick={nextChallenge}
+                                            style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(16,185,129,0.5) 100%)', borderColor: 'var(--green)', boxShadow: '0 0 20px rgba(16,185,129,0.3)' }}
+                                        >
+                                            <Send size={16} style={{ marginRight: 8, display: 'inline-block', verticalAlign: 'middle' }} /> 
+                                            <span style={{ verticalAlign: 'middle' }}>Advance to Next Node</span>
+                                        </motion.button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {!isLevelComplete && (
+                                <>
+                                    {isScanning && <div className="scanline" style={{ top: '0%', animation: 'scanMove 2s linear infinite', height: '10vh' }} />}
+                                    <textarea
+                                        value={code}
+                                        onChange={(e) => setCode(e.target.value)}
+                                        spellCheck="false"
+                                        className="mono"
+                                        style={{
+                                            width: '100%', height: '100%', padding: '1.5rem',
+                                            background: 'transparent', color: '#38bdf8', // Brighter cyan for code
+                                            border: 'none', outline: 'none', resize: 'none',
+                                            fontSize: '0.95rem', lineHeight: '1.7',
+                                            opacity: isScanning ? 0.6 : 1, transition: 'opacity 0.2s',
+                                            textShadow: '0 0 5px rgba(56,189,248,0.5)',
+                                            position: 'relative', zIndex: 5
+                                        }}
+                                        placeholder="# Initialize Python Script..."
+                                    />
+                                </>
+                            )}
+                            <div style={{ position: 'absolute', bottom: 12, right: 12, opacity: 0.2, color: 'var(--cyan)', zIndex: 1 }}>
                                 <LayoutGrid size={20} />
                             </div>
                         </div>
@@ -234,16 +265,18 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
                            {isScanning && <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} style={{ fontSize: '1rem' }}>↻</motion.div>}
                         </div>
 
-                        <motion.button 
-                            className="g-btn-primary"
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.98 }}
-                            disabled={!isEngineReady || isScanning}
-                            onClick={runCode}
-                            style={{ marginTop: '2rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
-                        >
-                            <Send size={16} /> Execute Core Sequence
-                        </motion.button>
+                        {!isLevelComplete && (
+                            <motion.button 
+                                className="g-btn-primary"
+                                whileHover={{ scale: 1.01 }}
+                                whileTap={{ scale: 0.98 }}
+                                disabled={!isEngineReady || isScanning}
+                                onClick={runCode}
+                                style={{ marginTop: '2rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
+                            >
+                                <Send size={16} /> Execute Core Sequence
+                            </motion.button>
+                        )}
                     </div>
                 </div>
             </div>
