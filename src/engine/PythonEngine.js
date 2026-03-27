@@ -5,21 +5,17 @@ class PythonEngine {
     }
 
     async checkInitialization() {
-        if (window.__BRYTHON__ && window.__BRYTHON__.run_python) {
+        if (typeof window !== 'undefined' && typeof window.brython === 'function') {
             this.isInitialized = true;
             return true;
         }
 
         return new Promise((resolve) => {
             const check = setInterval(() => {
-                if (window.__BRYTHON__ && window.__BRYTHON__.run_python) {
+                if (typeof window !== 'undefined' && typeof window.brython === 'function') {
                     this.isInitialized = true;
                     clearInterval(check);
                     resolve(true);
-                } else if (typeof window.brython === 'function') {
-                    try {
-                        window.brython({ debug: 0, indexedDB: false });
-                    } catch(e) {}
                 }
             }, 500);
             
@@ -36,37 +32,58 @@ class PythonEngine {
             if (!ready) return { success: false, message: "CRITICAL: Python Core failed to initialize." };
         }
 
-        try {
-            const pythonScript = `
+        return new Promise((resolve) => {
+            try {
+                const escapedCode = code.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+                const escapedRule = validationRule.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+                
+                const pythonScriptCode = `
 import sys
 from browser import window
 
 try:
-    source = """${code.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}\"""
-    exec(source, globals())
-    result = eval("${validationRule.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}")
+    source = """${escapedCode}"""
+    test_globals = {}
+    exec(source, test_globals)
+    result = eval("${escapedRule}", test_globals)
     window.lastPythonResult = result
     window.lastPythonError = None
 except Exception as e:
     window.lastPythonResult = False
     window.lastPythonError = str(e)
 `;
-            window.lastPythonResult = undefined;
-            window.lastPythonError = undefined;
+                window.lastPythonResult = undefined;
+                window.lastPythonError = undefined;
 
-            window.__BRYTHON__.run_python(pythonScript, "challenge_script", true);
+                const script = document.createElement('script');
+                script.type = 'text/python';
+                script.textContent = pythonScriptCode;
+                document.body.appendChild(script);
 
-            if (window.lastPythonError) {
-                return { success: false, message: `PYTHON ERROR: ${window.lastPythonError}` };
+                // Initialize the new script tag
+                window.brython({ debug: 0, indexedDB: false });
+
+                // Allow brython execution some time
+                setTimeout(() => {
+                    // Clean up script tag
+                    if (document.body.contains(script)) {
+                        document.body.removeChild(script);
+                    }
+                    
+                    if (window.lastPythonError) {
+                        resolve({ success: false, message: `PYTHON ERROR: ${window.lastPythonError}` });
+                    } else {
+                        resolve({ 
+                            success: window.lastPythonResult === true, 
+                            message: window.lastPythonResult === true ? "STABILIZED: Core Nominal." : "ERROR: Logic Mismatch." 
+                        });
+                    }
+                }, 150);
+
+            } catch (error) {
+                resolve({ success: false, message: `CRITICAL: ${error.message}` });
             }
-
-            return { 
-                success: window.lastPythonResult === true, 
-                message: window.lastPythonResult === true ? "STABILIZED: Core Nominal." : "ERROR: Logic Mismatch." 
-            };
-        } catch (error) {
-            return { success: false, message: `CRITICAL: ${error.message}` };
-        }
+        });
     }
 }
 
