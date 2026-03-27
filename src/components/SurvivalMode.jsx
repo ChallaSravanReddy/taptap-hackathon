@@ -15,6 +15,7 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
     const [isEngineReady, setIsEngineReady] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const [isCompiling, setIsCompiling] = useState(false);
+    const [showLevelComplete, setShowLevelComplete] = useState(false);
 
     useEffect(() => {
         setChallenges([...challengesData].sort(() => Math.random() - 0.5));
@@ -61,8 +62,7 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
         if (result.success) {
             setOutputType('success');
             setOutput(`SUCCESS: ${result.message} // CORE_STABILIZED`);
-            setTimer(t => Math.min(t + 45, 600));
-            setTimeout(nextChallenge, 2500);
+            setShowLevelComplete(true);
         } else {
             setOutputType('error');
             setOutput(`FATAL_ERROR: ${result.message} // INTEGRITY_CRITICAL`);
@@ -72,6 +72,8 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
     };
 
     const nextChallenge = () => {
+        setShowLevelComplete(false);
+        setTimer(600);
         setOutputType('info');
         setOutput('SEQUENCER_RELOADED // READY');
         setCode('');
@@ -183,8 +185,41 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
                         </span>
                     </div>
 
-                    <div style={{ padding: '2.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ padding: '2.5rem', flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
                         
+                        <AnimatePresence>
+                            {showLevelComplete && (
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    style={{
+                                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                                        background: 'rgba(5, 10, 15, 0.9)', backdropFilter: 'blur(8px)',
+                                        zIndex: 10, display: 'flex', flexDirection: 'column',
+                                        alignItems: 'center', justifyContent: 'center', padding: '2rem',
+                                        borderRadius: '0 0 1rem 1rem'
+                                    }}
+                                >
+                                    <ShieldCheck size={48} style={{ color: 'var(--green)', marginBottom: '1.5rem' }} />
+                                    <h2 style={{ fontSize: '2rem', fontWeight: 600, color: 'var(--green)', marginBottom: '0.5rem', textAlign: 'center' }}>
+                                        LEVEL CLEARED
+                                    </h2>
+                                    <p style={{ color: 'var(--dim)', textAlign: 'center', marginBottom: '2.5rem', maxWidth: 400 }}>
+                                        Congratulations! The core has been stabilized and logic paradox resolved. Ready for the next sequence?
+                                    </p>
+                                    <motion.button 
+                                        className="g-btn-primary"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={nextChallenge}
+                                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '1rem 2rem' }}
+                                    >
+                                        <Send size={18} /> Load Next Level
+                                    </motion.button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                         <div style={{ marginBottom: '2rem' }}>
                            <div className="hud-label" style={{ color: 'var(--cyan)', opacity: 0.5, marginBottom: '0.5rem' }}>Mission_Objective: Solve the Logic Paradox</div>
                            <h2 style={{ fontSize: '1.25rem', fontWeight: 500, lineHeight: 1.6, color: '#fff' }}>
