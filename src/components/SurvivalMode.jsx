@@ -98,7 +98,7 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
             style={{ width: '100%', maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative', zIndex: 5 }}
         >
             {/* Top Stat HUD */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '1.5rem' }}>
+            <div className="grid-3col">
                 <div className="g-panel" style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{ color: 'var(--cyan)', opacity: 0.6 }}><Cpu size={18} /></div>
                     <div>
@@ -136,11 +136,15 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
             </div>
 
             {/* Main Game Area */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '1.5rem', minHeight: 640 }}>
+            <div className="grid-survival" style={{ minHeight: 640 }}>
                 
                 {/* Left: Life Monitor Panel */}
-                <div className="g-panel g-panel-corner" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem', position: 'relative' }}>
-                    <div style={{ position: 'absolute', top: 16, left: 16, padding: '4px 10px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 4 }}>
+                <div className="g-panel g-panel-corner" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem', position: 'relative', overflow: 'hidden' }}>
+                    
+                    {/* Background grid accent */}
+                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(0,240,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.05) 1px, transparent 1px)', backgroundSize: '20px 20px', pointerEvents: 'none' }} />
+
+                    <div style={{ position: 'absolute', top: 16, left: 16, padding: '4px 10px', background: 'rgba(0,0,0,0.5)', border: '1px solid var(--border)', borderRadius: 0, clipPath: 'polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)', backdropFilter: 'blur(4px)' }}>
                         <div className="hud-label" style={{ fontSize: '0.5rem' }}>Avatar_Node_4</div>
                     </div>
                     
@@ -227,8 +231,9 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
                            </h2>
                         </div>
 
-                        <div style={{ flex: 1, position: 'relative', background: 'rgba(0,0,0,0.3)', borderRadius: '0.75rem', border: '1px solid rgba(255,255,255,0.03)', overflow: 'hidden' }}>
-                            {isScanning && <div className="scanline" style={{ top: '0%', animation: 'scanMove 2s linear infinite' }} />}
+                        <div style={{ flex: 1, position: 'relative', background: 'rgba(2,6,23,0.8)', borderRadius: 0, border: '1px solid rgba(0,240,255,0.1)', overflow: 'hidden', boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)' }}>
+                            <div className="crt-overlay" style={{ opacity: 0.15 }} />
+                            {isScanning && <div className="scanline" style={{ top: '0%', animation: 'scanMove 2s linear infinite', height: '10vh' }} />}
                             <textarea
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
@@ -236,15 +241,17 @@ const SurvivalMode = ({ onGameOver, onIntensityChange }) => {
                                 className="mono"
                                 style={{
                                     width: '100%', height: '100%', padding: '1.5rem',
-                                    background: 'transparent', color: 'var(--cyan)',
+                                    background: 'transparent', color: '#38bdf8', // Brighter cyan for code
                                     border: 'none', outline: 'none', resize: 'none',
-                                    fontSize: '0.9rem', lineHeight: '1.7',
-                                    opacity: isScanning ? 0.6 : 1, transition: 'opacity 0.2s'
+                                    fontSize: '0.95rem', lineHeight: '1.7',
+                                    opacity: isScanning ? 0.6 : 1, transition: 'opacity 0.2s',
+                                    textShadow: '0 0 5px rgba(56,189,248,0.5)',
+                                    position: 'relative', zIndex: 5
                                 }}
                                 placeholder="# Initialize Python Script..."
                             />
-                            <div style={{ position: 'absolute', bottom: 12, right: 12, opacity: 0.1 }}>
-                                <LayoutGrid size={16} />
+                            <div style={{ position: 'absolute', bottom: 12, right: 12, opacity: 0.2, color: 'var(--cyan)' }}>
+                                <LayoutGrid size={20} />
                             </div>
                         </div>
 

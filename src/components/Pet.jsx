@@ -45,19 +45,39 @@ const Pet = ({ state }) => {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem' }}>
 
       {/* ── Avatar Glow Base ── */}
-      <div style={{ position: 'relative', width: 140, height: 140, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ position: 'relative', width: 180, height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1rem' }}>
+        
+        {/* Holographic Projection Base */}
+        <div className="hologram-base" style={{ position: 'absolute', bottom: -30, zIndex: 0 }} />
 
         {/* Soft ambient glow */}
         <div style={{
-          position: 'absolute', inset: -20,
+          position: 'absolute', inset: -30,
           borderRadius: '50%',
           background: `radial-gradient(circle, ${c.glowSoft}, transparent 70%)`,
-          animation: 'petGlow 2s ease-in-out infinite'
+          animation: 'petGlow 3s ease-in-out infinite'
         }} />
 
-        {/* Pulse ring */}
-        <div style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `1.5px solid ${c.ringColor}`, animation: 'pulseRing 2s ease-out infinite' }} />
-        {isCrit && <div style={{ position: 'absolute', inset: -12, borderRadius: '50%', border: `1px solid ${c.ringColor}`, animation: 'pulseRing 2s ease-out infinite 0.4s' }} />}
+        {/* 3D Rotating Rings */}
+        <motion.div 
+          animate={{ rotateZ: 360, rotateX: 60 }} 
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+          style={{ position: 'absolute', inset: -15, borderRadius: '50%', border: `2px dashed ${c.ringColor}`, opacity: 0.6, borderTopColor: 'transparent', borderBottomColor: 'transparent' }} 
+        />
+        <motion.div 
+          animate={{ rotateZ: -360, rotateY: 60 }} 
+          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+          style={{ position: 'absolute', inset: -25, borderRadius: '50%', border: `1px solid ${c.ringColor}`, opacity: 0.3 }} 
+        />
+        <motion.div 
+          animate={{ rotateZ: 360 }} 
+          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+          style={{ position: 'absolute', inset: -5, borderRadius: '50%', border: `3px dotted ${c.ringColor}`, opacity: 0.8, borderLeftColor: 'transparent' }} 
+        />
+
+        {/* Pulse rings */}
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `1.5px solid ${c.ringColor}`, animation: 'pulseRing 2s ease-out infinite', zIndex: 1 }} />
+        {isCrit && <div style={{ position: 'absolute', inset: -12, borderRadius: '50%', border: `1px solid ${c.ringColor}`, animation: 'pulseRing 2s ease-out infinite 0.4s', zIndex: 1 }} />}
 
         {/* Main orb */}
         <motion.div
@@ -107,8 +127,8 @@ const Pet = ({ state }) => {
       </div>
 
       {/* Status label */}
-      <div style={{ textAlign: 'center' }}>
-        <div className="hud-label" style={{ marginBottom: 4 }}>Digital Core</div>
+      <div style={{ textAlign: 'center', marginTop: '1rem', position: 'relative', zIndex: 5 }}>
+        <div className="hud-label" style={{ marginBottom: 4, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>Digital Core</div>
         <motion.div
           animate={isCrit ? { opacity: [1, 0.3, 1] } : { opacity: 1 }}
           transition={isCrit ? { duration: 0.5, repeat: Infinity } : {}}

@@ -91,7 +91,7 @@ const MazeMode = ({ onGameOver, onVictory, onIntensityChange }) => {
             style={{ width: '100%', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 5 }}
         >
             {/* Top HUD Bar */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div className="grid-3col" style={{ marginBottom: '1.5rem' }}>
                 <div className="g-panel" style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{ color: 'var(--cyan)', opacity: 0.6 }}><Target size={18} /></div>
                     <div>
@@ -100,12 +100,15 @@ const MazeMode = ({ onGameOver, onVictory, onIntensityChange }) => {
                     </div>
                 </div>
 
-                <div className="g-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderBottom: timer <= 5 ? '1px solid var(--red)' : '1px solid var(--border)' }}>
+                <motion.div 
+                    animate={timer <= 5 ? { scale: [1, 1.05, 1], boxShadow: ['0 0 0px var(--red)', '0 0 30px var(--red)', '0 0 0px var(--red)'] } : {}}
+                    transition={{ repeat: Infinity, duration: 0.8, ease: 'easeInOut' }}
+                    className="g-panel" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderBottom: timer <= 5 ? '2px solid var(--red)' : '1px solid var(--border)' }}>
                     <div className="hud-label" style={{ marginBottom: 4 }}>Neural Link Timer</div>
-                    <div className={timer <= 5 ? 'hud-value-crit' : 'hud-value'} style={{ fontSize: '1.5rem', fontFamily: 'var(--font-mono)' }}>
+                    <div className={timer <= 5 ? 'hud-value-crit' : 'hud-value'} style={{ fontSize: '1.75rem', fontFamily: 'var(--font-mono)' }}>
                         {timer.toString().padStart(2, '0')}<span style={{ fontSize: '0.8rem', opacity: 0.5, marginLeft: 2 }}>SEC</span>
                     </div>
-                </div>
+                </motion.div>
 
                 <div className="g-panel" style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem' }}>
                     <div style={{ textAlign: 'right' }}>
@@ -161,17 +164,21 @@ const MazeMode = ({ onGameOver, onVictory, onIntensityChange }) => {
                         </h2>
                     </div>
                     
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                    <div className="grid-2col">
                         {q.options.map((opt, i) => {
                             const isCorrect = isAnswered && i === q.correct;
                             const isWrong = isAnswered && i === selectedIdx && i !== q.correct;
                             return (
                                 <motion.button
                                     key={i}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.4, delay: i * 0.1, type: 'spring' }}
                                     disabled={isAnswered}
                                     onClick={() => checkAnswer(i)}
                                     className={`choice-card ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
-                                    whileHover={!isAnswered ? { x: 8 } : {}}
+                                    whileHover={!isAnswered ? { x: 8, scale: 1.01 } : {}}
+                                    whileTap={!isAnswered ? { scale: 0.98 } : {}}
                                     style={{ display: 'flex', alignItems: 'center', gap: '1rem', position: 'relative' }}
                                 >
                                     <div style={{ 
