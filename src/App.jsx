@@ -105,7 +105,7 @@ const App = () => {
           {dashboardTab === 'Dashboard' && <DashboardView user={user} onNavigate={setDashboardTab} onLaunchGame={handleLaunchGame} />}
 
           {dashboardTab === 'Prepare' && (
-            <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 140px)', minHeight: '600px', background: '#0f172a', borderRadius: '16px', overflow: 'hidden', border: '1px solid #1e293b' }}>
+            <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: 'calc(100vh - 70px)', background: '#0f172a', overflow: 'hidden' }}>
               <div className="crt-overlay" />
               <Stars />
               <Glitch active={shake} />

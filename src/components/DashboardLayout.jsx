@@ -142,7 +142,7 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
         </div>
 
         {/* PAGE CONTENT */}
-        <div style={{ padding: '30px', flex: 1, overflowY: 'auto' }}>
+        <div style={{ padding: activeTab === 'Prepare' ? 0 : '30px', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>
       </div>
