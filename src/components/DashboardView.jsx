@@ -56,40 +56,9 @@ const DashboardView = ({ user, onNavigate, onLaunchGame }) => {
           </div>
         </div>
 
-        {/* Badges & Metrics Column */}
+        {/* Middle Column (Smart Interview & Metrics) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          
-          {/* Badges Card */}
-          <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', flex: 1 }}>
-            <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1rem', color: '#333', borderBottom: '1px solid #f0f0f0', paddingBottom: '15px' }}>My Badges</h3>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0' }}>
-              <div style={{ background: '#111', padding: '15px', borderRadius: '8px', position: 'relative', textAlign: 'center', border: '2px solid #333' }}>
-                <div style={{ color: '#fbbf24', fontSize: '0.7rem', fontWeight: 'bold', letterSpacing: '1px', marginBottom: '5px' }}>HELLO WORLD</div>
-                <div style={{ color: '#10b981', fontSize: '2rem' }}>★</div>
-                <div style={{ color: '#10b981', fontSize: '0.6rem', marginTop: '5px', letterSpacing: '0.5px' }}>SUCCESSFULLY LOGIN</div>
-                <div style={{ position: 'absolute', bottom: '-5px', left: '-10px', right: '-10px', height: '10px', background: '#333', clipPath: 'polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%)' }} />
-              </div>
-            </div>
-          </div>
-
-          {/* Learning Metrics Card */}
-          <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', flex: 1, backgroundColor: '#fafafa' }}>
-             <h3 style={{ margin: '0 0 20px 0', fontSize: '1.1rem', color: '#333' }}>My Learning Metrics</h3>
-             <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 600, color: '#333', marginBottom: '4px' }}>Hour Spent</div>
-                  <div style={{ color: '#666', fontSize: '0.9rem' }}>8 minutes</div>
-                </div>
-                <select style={{ padding: '6px 12px', borderRadius: '20px', border: '1px solid #ddd', background: '#fff', outline: 'none', fontSize: '0.8rem' }}>
-                  <option>Last 7 Days</option>
-                </select>
-             </div>
-          </div>
-
-        </div>
-
-        {/* Smart Interview Card */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Smart Interview Card */}
           <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #f8e8ff' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
               <div>
@@ -121,23 +90,25 @@ const DashboardView = ({ user, onNavigate, onLaunchGame }) => {
               </button>
             </div>
           </div>
-          
-          {/* Metadata Card (MET Score) */}
-           <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-             <div style={{ background: '#8b5cf6', borderRadius: '8px', padding: '20px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ background: '#fff', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ color: '#8b5cf6', fontWeight: 'bold' }}>↗</span>
-                  </div>
-                  <span style={{ fontWeight: 600 }}>MET Score</span>
-                </div>
-                <div>
-                   <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>NA</span><span style={{ opacity: 0.7 }}>/100</span>
-                </div>
-             </div>
-           </div>
 
-           {/* Games / Puzzles Card (LinkedIn Style) */}
+          {/* Learning Metrics Card */}
+          <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', flex: 1, backgroundColor: '#fafafa' }}>
+             <h3 style={{ margin: '0 0 20px 0', fontSize: '1.1rem', color: '#333' }}>My Learning Metrics</h3>
+             <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: 600, color: '#333', marginBottom: '4px' }}>Hour Spent</div>
+                  <div style={{ color: '#666', fontSize: '0.9rem' }}>8 minutes</div>
+                </div>
+                <select style={{ padding: '6px 12px', borderRadius: '20px', border: '1px solid #ddd', background: '#fff', outline: 'none', fontSize: '0.8rem' }}>
+                  <option>Last 7 Days</option>
+                </select>
+             </div>
+          </div>
+        </div>
+
+        {/* Right Column (Games & Metadata) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+           {/* Games / Puzzles Card (LinkedIn Style - Top) */}
            <div style={{ background: '#fff', borderRadius: '12px', padding: '20px 24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#111' }}>Today's games</h3>
@@ -187,6 +158,21 @@ const DashboardView = ({ user, onNavigate, onLaunchGame }) => {
                 </div>
 
               </div>
+           </div>
+
+          {/* Metadata Card (MET Score) */}
+           <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
+             <div style={{ background: '#8b5cf6', borderRadius: '8px', padding: '20px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ background: '#fff', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ color: '#8b5cf6', fontWeight: 'bold' }}>↗</span>
+                  </div>
+                  <span style={{ fontWeight: 600 }}>MET Score</span>
+                </div>
+                <div>
+                   <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>NA</span><span style={{ opacity: 0.7 }}>/100</span>
+                </div>
+             </div>
            </div>
         </div>
         
