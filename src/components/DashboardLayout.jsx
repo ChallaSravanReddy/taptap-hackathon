@@ -6,10 +6,10 @@ import {
 import NotificationSystem from './NotificationSystem';
 import LeaderboardSystem from './LeaderboardSystem';
 
-const DashboardLayout = ({ user, children }) => {
+const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children }) => {
   // Navigation Menu matching the TapTap side menu style
   const navItems = [
-    { label: 'Dashboard', icon: <LayoutDashboard size={18} />, active: true },
+    { label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     { label: 'Socials', icon: <MessageSquare size={18} /> },
     { label: 'Learn', icon: <BookOpen size={18} /> },
     { label: 'Employability Track', icon: <Target size={18} /> },
@@ -50,32 +50,36 @@ const DashboardLayout = ({ user, children }) => {
 
         {/* Navigation */}
         <div style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
-          {navItems.map(item => (
-            <div 
-              key={item.label}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                background: item.active ? '#2c2c2c' : 'transparent',
-                color: item.active ? '#fff' : '#aaa',
-                cursor: 'pointer',
-                fontWeight: item.active ? 600 : 400,
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                if(!item.active) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }
-              }}
-              onMouseLeave={(e) => {
-                if(!item.active) { e.currentTarget.style.color = '#aaa'; e.currentTarget.style.background = 'transparent'; }
-              }}
-            >
-              {item.icon}
-              <span style={{ fontSize: '0.9rem' }}>{item.label}</span>
-            </div>
-          ))}
+          {navItems.map(item => {
+            const isActive = activeTab === item.label;
+            return (
+              <div 
+                key={item.label}
+                onClick={() => onTabChange && onTabChange(item.label)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  background: isActive ? '#2c2c2c' : 'transparent',
+                  color: isActive ? '#fff' : '#aaa',
+                  cursor: 'pointer',
+                  fontWeight: isActive ? 600 : 400,
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  if(!isActive) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }
+                }}
+                onMouseLeave={(e) => {
+                  if(!isActive) { e.currentTarget.style.color = '#aaa'; e.currentTarget.style.background = 'transparent'; }
+                }}
+              >
+                {item.icon}
+                <span style={{ fontSize: '0.9rem' }}>{item.label}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 

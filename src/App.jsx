@@ -5,6 +5,7 @@ import MazeMode from './components/MazeMode';
 import SurvivalMode from './components/SurvivalMode';
 import LoginScreen from './components/LoginScreen';
 import DashboardLayout from './components/DashboardLayout';
+import DashboardView from './components/DashboardView';
 
 
 /* ── SCREEN GLITCH ─────────────────────────────────── */
@@ -65,6 +66,7 @@ const App = () => {
   const [score, setScore]   = useState(0);
   const [shake, setShake]   = useState(false);
   const [selectedMode, setSelectedMode] = useState(null);
+  const [dashboardTab, setDashboardTab] = useState('Dashboard');
 
   const triggerShake = () => {
     setShake(true);
@@ -82,6 +84,11 @@ const App = () => {
     setScreen(type);
   };
 
+  const handleLaunchGame = (mode) => {
+    startGame(mode);
+    setDashboardTab('Prepare');
+  };
+
   return (
     <div className={shake ? 'screen-shake' : ''} style={{ minHeight: '100vh', position: 'relative' }}>
       <div className="crt-overlay" />
@@ -93,30 +100,39 @@ const App = () => {
           <LoginScreen key="login" onLogin={setUser} />
         </AnimatePresence>
       ) : (
-        <DashboardLayout user={user}>
-          {/* We keep the cyberpunk elements constrained to the game view if we want, 
-              but since we changed the whole UI flow to match TapTap dashboard, 
-              we can just render the active Game Mode here. */}
-          <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 140px)', minHeight: '600px', background: '#0f172a', borderRadius: '16px', overflow: 'hidden', border: '1px solid #1e293b' }}>
-            <div className="crt-overlay" />
-            <Stars />
-            <Glitch active={shake} />
+        <DashboardLayout user={user} activeTab={dashboardTab} onTabChange={setDashboardTab}>
+          
+          {dashboardTab === 'Dashboard' && <DashboardView user={user} onNavigate={setDashboardTab} onLaunchGame={handleLaunchGame} />}
 
-            {/* Corner HUD decorations */}
-            <div style={corner('top-left')} />
-            <div style={corner('top-right')} />
-            <div style={corner('bottom-left')} />
-            <div style={corner('bottom-right')} />
+          {dashboardTab === 'Prepare' && (
+            <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 140px)', minHeight: '600px', background: '#0f172a', borderRadius: '16px', overflow: 'hidden', border: '1px solid #1e293b' }}>
+              <div className="crt-overlay" />
+              <Stars />
+              <Glitch active={shake} />
 
-            <AnimatePresence mode="wait">
-              {screen === 'start'    && <StartScreen    key="start" user={user} onStart={startGame} />}
-              {screen === 'maze'     && <MazeMode       key="maze" onGameOver={s => end(s,'gameover')} onVictory={s => end(s,'victory')} onIntensityChange={triggerShake} />}
-              {screen === 'survival' && <SurvivalMode   key="surv" onGameOver={s => end(s,'gameover')} onIntensityChange={triggerShake} />}
-              {(screen === 'gameover' || screen === 'victory') && (
-                <EndScreen key="end" type={screen} score={score} onRestart={() => setScreen('start')} />
-              )}
-            </AnimatePresence>
-          </div>
+              <div style={corner('top-left')} />
+              <div style={corner('top-right')} />
+              <div style={corner('bottom-left')} />
+              <div style={corner('bottom-right')} />
+
+              <AnimatePresence mode="wait">
+                {screen === 'start'    && <StartScreen    key="start" user={user} onStart={startGame} />}
+                {screen === 'maze'     && <MazeMode       key="maze" onGameOver={s => end(s,'gameover')} onVictory={s => end(s,'victory')} onIntensityChange={triggerShake} />}
+                {screen === 'survival' && <SurvivalMode   key="surv" onGameOver={s => end(s,'gameover')} onIntensityChange={triggerShake} />}
+                {(screen === 'gameover' || screen === 'victory') && (
+                  <EndScreen key="end" type={screen} score={score} onRestart={() => setScreen('start')} />
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {dashboardTab !== 'Dashboard' && dashboardTab !== 'Prepare' && (
+            <div style={{ padding: '40px', textAlign: 'center', background: '#fff', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
+               <h2 style={{ color: '#333' }}>{dashboardTab}</h2>
+               <p style={{ color: '#666' }}>This module is currently under development.</p>
+            </div>
+          )}
+
         </DashboardLayout>
       )}
     </div>
