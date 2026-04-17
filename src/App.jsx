@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Zap, RefreshCcw, ChevronRight, Cpu, Triangle, RotateCcw } from 'lucide-react';
 import MazeMode from './components/MazeMode';
 import SurvivalMode from './components/SurvivalMode';
+import LoginScreen from './components/LoginScreen';
+import DashboardLayout from './components/DashboardLayout';
+
 
 /* ── SCREEN GLITCH ─────────────────────────────────── */
 const Glitch = ({ active }) => (
@@ -57,6 +60,7 @@ const Stars = () => {
 
 /* ── MAIN APP ──────────────────────────────────────── */
 const App = () => {
+  const [user, setUser] = useState(null);
   const [screen, setScreen] = useState('start');
   const [score, setScore]   = useState(0);
   const [shake, setShake]   = useState(false);
@@ -84,20 +88,37 @@ const App = () => {
       <Stars />
       <Glitch active={shake} />
 
-      {/* Corner HUD decorations */}
-      <div style={corner('top-left')} />
-      <div style={corner('top-right')} />
-      <div style={corner('bottom-left')} />
-      <div style={corner('bottom-right')} />
+      {!user ? (
+        <AnimatePresence mode="wait">
+          <LoginScreen key="login" onLogin={setUser} />
+        </AnimatePresence>
+      ) : (
+        <DashboardLayout user={user}>
+          {/* We keep the cyberpunk elements constrained to the game view if we want, 
+              but since we changed the whole UI flow to match TapTap dashboard, 
+              we can just render the active Game Mode here. */}
+          <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 140px)', minHeight: '600px', background: '#0f172a', borderRadius: '16px', overflow: 'hidden', border: '1px solid #1e293b' }}>
+            <div className="crt-overlay" />
+            <Stars />
+            <Glitch active={shake} />
 
-      <AnimatePresence mode="wait">
-        {screen === 'start'    && <StartScreen    key="start" onStart={startGame} />}
-        {screen === 'maze'     && <MazeMode       key="maze" onGameOver={s => end(s,'gameover')} onVictory={s => end(s,'victory')} onIntensityChange={triggerShake} />}
-        {screen === 'survival' && <SurvivalMode   key="surv" onGameOver={s => end(s,'gameover')} onIntensityChange={triggerShake} />}
-        {(screen === 'gameover' || screen === 'victory') && (
-          <EndScreen key="end" type={screen} score={score} onRestart={() => setScreen('start')} />
-        )}
-      </AnimatePresence>
+            {/* Corner HUD decorations */}
+            <div style={corner('top-left')} />
+            <div style={corner('top-right')} />
+            <div style={corner('bottom-left')} />
+            <div style={corner('bottom-right')} />
+
+            <AnimatePresence mode="wait">
+              {screen === 'start'    && <StartScreen    key="start" user={user} onStart={startGame} />}
+              {screen === 'maze'     && <MazeMode       key="maze" onGameOver={s => end(s,'gameover')} onVictory={s => end(s,'victory')} onIntensityChange={triggerShake} />}
+              {screen === 'survival' && <SurvivalMode   key="surv" onGameOver={s => end(s,'gameover')} onIntensityChange={triggerShake} />}
+              {(screen === 'gameover' || screen === 'victory') && (
+                <EndScreen key="end" type={screen} score={score} onRestart={() => setScreen('start')} />
+              )}
+            </AnimatePresence>
+          </div>
+        </DashboardLayout>
+      )}
     </div>
   );
 };
@@ -115,14 +136,14 @@ const corner = (pos) => {
 };
 
 /* ── START SCREEN ──────────────────────────────────── */
-const StartScreen = ({ onStart }) => {
+const StartScreen = ({ user, onStart }) => {
   const [hover, setHover] = useState(null);
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, filter: 'blur(10px)' }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 5 }}
+      style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 5, overflowY: 'auto' }}
     >
       <div style={{ maxWidth: 900, width: '100%', textAlign: 'center' }}>
 
@@ -138,7 +159,7 @@ const StartScreen = ({ onStart }) => {
           }}
         >
           <Triangle size={12} fill="var(--cyan)" style={{ color: 'transparent', filter: 'drop-shadow(0 0 4px var(--cyan))' }} />
-          <span className="hud-label" style={{ color: 'var(--cyan)' }}>Neural Interface Active — v2.1.0</span>
+          <span className="hud-label" style={{ color: 'var(--cyan)' }}>Welcome {user?.handle} // {user?.college} // Lvl: {user?.role}</span>
           <Triangle size={12} fill="var(--cyan)" style={{ color: 'transparent', transform: 'rotate(180deg)', filter: 'drop-shadow(0 0 4px var(--cyan))' }} />
         </motion.div>
 
@@ -253,7 +274,7 @@ const StartScreen = ({ onStart }) => {
 const EndScreen = ({ type, score, onRestart }) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-    style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, position: 'relative', padding: '2rem' }}
+    style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, position: 'relative', padding: '2rem', overflowY: 'auto' }}
   >
     <div style={{ textAlign: 'center', maxWidth: 480 }}>
       <div className="hud-label" style={{ marginBottom: '1.5rem', color: type === 'victory' ? 'var(--green)' : 'var(--red)' }}>
