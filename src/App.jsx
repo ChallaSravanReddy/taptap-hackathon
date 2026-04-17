@@ -91,9 +91,13 @@ const App = () => {
 
   return (
     <div className={shake ? 'screen-shake' : ''} style={{ minHeight: '100vh', position: 'relative' }}>
-      <div className="crt-overlay" />
-      <Stars />
-      <Glitch active={shake} />
+      {!user && (
+        <>
+          <div className="crt-overlay" />
+          <Stars />
+          <Glitch active={shake} />
+        </>
+      )}
 
       {!user ? (
         <AnimatePresence mode="wait">
