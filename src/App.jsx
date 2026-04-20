@@ -14,6 +14,7 @@ import GamesView from './components/GamesView';
 import JobsView from './components/JobsView';
 import StudyAbroadView from './components/StudyAbroadView';
 import CollegeView from './components/CollegeView';
+import AdminView from './components/AdminView';
 
 
 /* ── SCREEN GLITCH ─────────────────────────────────── */
@@ -161,7 +162,9 @@ const App = () => {
 
           {dashboardTab === 'My College' && <CollegeView />}
 
-          {!['Dashboard', 'Profile', 'Learn', 'Assess', 'Prepare', 'Games', 'Job Posts', 'Study Abroad', 'My College'].includes(dashboardTab) && (
+          {dashboardTab === 'Admin Panel' && user?.role === 'Admin' && <AdminView />}
+
+          {!['Dashboard', 'Profile', 'Learn', 'Assess', 'Prepare', 'Games', 'Job Posts', 'Study Abroad', 'My College', 'Admin Panel'].includes(dashboardTab) && (
             <div style={{ padding: '60px 40px', textAlign: 'center', background: '#fff', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
                <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1', margin: '0 auto 24px' }}>
                   <Terminal size={40} />

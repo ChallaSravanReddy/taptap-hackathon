@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings, CheckSquare, BookOpen, Target, 
   Briefcase, Globe, GraduationCap, X, Check, LayoutDashboard,
   ChevronUp, ChevronDown, AlertTriangle, Brain, Rocket, Zap, FileText, ArrowRight, Play, Clock, Award, ShieldCheck, Terminal, Flame, TrendingUp, Users, Medal
 } from 'lucide-react';
+import { GameConfigService } from '../data/GameConfigService';
 
 const DashboardView = ({ user, onNavigate, onLaunchGame }) => {
   const [isCustomizing, setIsCustomizing] = useState(false);
-  
+  const [todayGame, setTodayGame] = useState(null);
+
+  useEffect(() => {
+    const fetchGame = async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await GameConfigService.getScheduleForDate(today);
+      if (data) {
+        setTodayGame(data);
+      } else {
+        setTodayGame({
+          gameId: 'runner',
+          title: 'Two Sum Problem',
+          desc: 'Find two numbers that add up to a target value. Test your array skills!'
+        });
+      }
+    };
+    fetchGame();
+  }, []);
+
   const [widgets, setWidgets] = useState([
     { id: 'goalBanner', visible: true, title: "Today's Goal & Streak", size: 2 },
     { id: 'quickActions', visible: true, title: "Quick Launch Actions", size: 2 },
@@ -42,7 +61,7 @@ const DashboardView = ({ user, onNavigate, onLaunchGame }) => {
 
   const getWidgetAction = (id) => {
     switch(id) {
-      case 'challenge': return () => onLaunchGame('runner');
+      case 'challenge': return () => onLaunchGame(todayGame?.gameId || 'runner');
       case 'learn': return () => onNavigate('Learn');
       case 'readiness': return () => onNavigate('Learn');
       case 'weakArea': return () => onNavigate('Assess');
@@ -164,8 +183,8 @@ const DashboardView = ({ user, onNavigate, onLaunchGame }) => {
                     <div style={{ width: 36, height: 36, borderRadius: '8px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Zap size={20} fill="#fff" /></div>
                     <span style={{ fontSize: '0.85rem', fontWeight: 900, textTransform: 'uppercase' }}>Challenge of the Day</span>
                   </div>
-                  <h2 style={{ fontSize: w.size === 2 ? '3.2rem' : '2rem', fontWeight: 900, margin: '0 0 16px 0' }}>Two Sum Problem</h2>
-                  <p style={{ opacity: 0.9, marginBottom: '40px', maxWidth: '600px' }}>Find two numbers that add up to a target value. Test your array skills!</p>
+                  <h2 style={{ fontSize: w.size === 2 ? '3.2rem' : '2rem', fontWeight: 900, margin: '0 0 16px 0' }}>{todayGame?.title || 'Loading...'}</h2>
+                  <p style={{ opacity: 0.9, marginBottom: '40px', maxWidth: '600px' }}>{todayGame?.desc || '...'}</p>
                   <button onClick={getWidgetAction(w.id)} style={{ background: '#fff', color: '#6366f1', border: 'none', padding: '16px 40px', borderRadius: '16px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>Solve Now <ArrowRight size={20} /></button>
                 </div>
               </div>

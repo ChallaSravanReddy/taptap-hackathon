@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   LayoutDashboard, MessageSquare, BookOpen, Target, 
-  CheckSquare, Briefcase, Globe, GraduationCap, LifeBuoy, Terminal, Code, X, Gamepad2
+  CheckSquare, Briefcase, Globe, GraduationCap, LifeBuoy, Terminal, Code, X, Gamepad2, ShieldAlert
 } from 'lucide-react';
 import NotificationSystem from './NotificationSystem';
 import LeaderboardSystem from './LeaderboardSystem';
@@ -21,6 +21,10 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
     { label: 'My College', icon: <GraduationCap size={18} /> },
     { label: 'Support', icon: <LifeBuoy size={18} /> },
   ];
+
+  if (user?.role === 'Admin') {
+     navItems.push({ label: 'Admin Panel', icon: <ShieldAlert size={18} /> });
+  }
 
   const initial = user?.handle ? user.handle.charAt(0).toUpperCase() : 'U';
 
