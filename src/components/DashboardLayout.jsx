@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   LayoutDashboard, MessageSquare, BookOpen, Target, 
-  CheckSquare, Briefcase, Globe, GraduationCap, LifeBuoy, Terminal, Code
+  CheckSquare, Briefcase, Globe, GraduationCap, LifeBuoy, Terminal, Code, X, Gamepad2
 } from 'lucide-react';
 import NotificationSystem from './NotificationSystem';
 import LeaderboardSystem from './LeaderboardSystem';
@@ -14,6 +14,7 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
     { label: 'Learn', icon: <BookOpen size={18} /> },
     { label: 'Employability Track', icon: <Target size={18} /> },
     { label: 'Prepare', icon: <CheckSquare size={18} /> },
+    { label: 'Games', icon: <Gamepad2 size={18} /> },
     { label: 'Assess', icon: <Briefcase size={18} /> },
     { label: 'Job Posts', icon: <Briefcase size={18} /> },
     { label: 'Study Abroad', icon: <Globe size={18} /> },
@@ -21,8 +22,10 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
     { label: 'Support', icon: <LifeBuoy size={18} /> },
   ];
 
+  const initial = user?.handle ? user.handle.charAt(0).toUpperCase() : 'U';
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f5f5', color: '#333', fontFamily: 'sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f5f5', color: '#333', fontFamily: 'sans-serif', position: 'relative', overflowX: 'hidden' }}>
       
       {/* ── SIDEBAR ── */}
       <div style={{ 
@@ -83,7 +86,6 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
         </div>
       </div>
 
-
       {/* ── MAIN CONTENT AREA ── */}
       <div style={{ flex: 1, marginLeft: '260px', display: 'flex', flexDirection: 'column' }}>
         
@@ -102,14 +104,10 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
           zIndex: 40
         }}>
           
-          {/* Left Side: Mock Scores (MET Score, etc) */}
+          {/* Left Side */}
           <div style={{ display: 'flex', gap: '15px' }}>
-            <div style={{ background: '#333', padding: '6px 12px', borderRadius: '20px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ background: '#7c3aed', padding: '2px 6px', borderRadius: '50%', fontSize: '0.6rem', color: 'white' }}>NA</span>
-              MET Score
-            </div>
             <div style={{ background: '#333', padding: '6px 16px', borderRadius: '20px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              🔥 0
+              🔥 Streak 0
             </div>
           </div>
 
@@ -126,10 +124,15 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
             {/* Notification System */}
             <NotificationSystem user={user} />
 
-            {/* Profile Info */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '10px' }}>
+            {/* Profile Info - Now Clickable */}
+            <div 
+              style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '10px', cursor: 'pointer', padding: '4px', borderRadius: '8px', transition: 'background 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              onClick={() => onTabChange && onTabChange('Profile')}
+            >
               <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f43f5e', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold' }}>
-                {user?.handle ? user.handle.charAt(0).toUpperCase() : 'U'}
+                {initial}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{user?.handle || 'User'}</span>

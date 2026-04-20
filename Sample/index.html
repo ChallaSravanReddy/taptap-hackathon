@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Career Readiness Check — Blackbucks</title>
+  <link rel="icon" type="image/jpeg" href="https://i.ibb.co/LzWjJntG/blackbucks-icon.jpg">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bb-purple: #6C47FF;
+      --bb-purple-dark: #4F2FD6;
+      --bb-purple-light: #EAE4FF;
+      --bb-bg: #F8F9FA;
+      --bb-surface: #FFFFFF;
+      --bb-border: rgba(0, 0, 0, 0.08);
+      --bb-text: #111827;
+      --bb-muted: #6B7280;
+      --bb-green: #22C55E;
+      --bb-amber: #F59E0B;
+      --bb-red: #EF4444;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bb-bg);
+      color: var(--bb-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .header {
+      width: 100%;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--bb-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--bb-text);
+      letter-spacing: -0.02em;
+    }
+
+    .logo img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px; /* slightly rounded corners */
+      object-fit: cover;
+    }
+
+    .logo span {
+      color: var(--bb-purple);
+    }
+
+    .header-tag {
+      font-size: 0.75rem;
+      color: var(--bb-muted);
+      border: 1px solid var(--bb-border);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      padding: 2.5rem 1.5rem 4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .landing-hero {
+      text-align: center;
+      padding: 2rem 0 2.5rem;
+    }
+
+    .landing-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(108, 71, 255, 0.15);
+      border: 1px solid rgba(108, 71, 255, 0.3);
+      color: #A78BFA;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+    }
+
+    .landing-chip::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #A78BFA;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8)
+      }
+    }
+
+    .landing-hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .landing-hero h1 em {
+      font-style: normal;
+      color: var(--bb-purple);
+    }
+
+    .landing-hero p {
+      font-size: 1rem;
+      color: var(--bb-muted);
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto 2rem;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--bb-text);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--bb-muted);
+      margin-top: 2px;
+    }
+
+    .btn-start {
+      background: var(--bb-purple);
+      color: #fff;
+      border: none;
+      padding: 14px 36px;
+      font-family: 'Sora', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: -0.01em;
+      box-shadow: 0 0 32px rgba(108, 71, 255, 0.35);
+    }
+
+    .btn-start:hover {
+      background: var(--bb-purple-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(108, 71, 255, 0.5);
+    }
+
+    .start-note {
+      font-size: 0.75rem;
+      color: var(--bb-muted);
+      margin-top: 0.85rem;
+    }
+
+    .progress-wrap {
+      margin-bottom: 2rem;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .progress-label {
+      font-size: 0.72rem;
+      color: var(--bb-muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .progress-track {
+      height: 3px;
+      background: rgba(0, 0, 0, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 3px;
+      background: linear-gradient(90deg, var(--bb-purple), #A78BFA);
+      border-radius: 2px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .q-card {
+      background: var(--bb-surface);
+      border: 1px solid var(--bb-border);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .q-text {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: -0.02em;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 1.5rem;
+    }
+
+    .opt-btn {
+      background: transparent;
+      border: 1px solid var(--bb-border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: var(--bb-text);
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .opt-btn:hover {
+      border-color: rgba(108, 71, 255, 0.5);
+      background: rgba(108, 71, 255, 0.07);
+    }
+
+    .opt-btn.selected {
+      border-color: var(--bb-purple);
+      background: rgba(108, 71, 255, 0.08);
+      color: var(--bb-purple-dark);
+    }
+
+    .opt-btn .opt-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(0, 0, 0, 0.2);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .opt-btn.selected .opt-dot {
+      background: var(--bb-purple);
+      border-color: var(--bb-purple);
+    }
+
+    .opt-btn.selected .opt-dot::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-back {
+      background: transparent;
+      border: 1px solid var(--bb-border);
+      color: var(--bb-muted);
+      padding: 11px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-back:hover:not(:disabled) {
+      border-color: rgba(0, 0, 0, 0.2);
+      color: var(--bb-text);
+    }
+
+    .btn-back:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-next {
+      background: var(--bb-purple);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Sora', sans-serif;
+      opacity: 0.4;
+    }
+
+    .btn-next.enabled {
+      opacity: 1;
+    }
+
+    .btn-next.enabled:hover {
+      background: var(--bb-purple-dark);
+      transform: translateY(-1px);
+    }
+
+    .icon-chevron-right {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-left: 6px;
+      vertical-align: -4px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .icon-chevron-left {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 6px;
+      vertical-align: -4px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 18 9 12 15 6'%3E%3C/polyline%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .lead-screen {
+      text-align: center;
+    }
+
+    .lead-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .lead-screen h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .lead-screen p {
+      color: var(--bb-muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--bb-muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 13px 15px;
+      background: var(--bb-surface);
+      border: 1px solid var(--bb-border);
+      border-radius: 10px;
+      color: var(--bb-text);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s;
+      appearance: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--bb-purple);
+    }
+
+    .form-group input::placeholder {
+      color: #9CA3AF;
+    }
+
+    .form-group select option {
+      background: #FFFFFF;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--bb-purple);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Sora', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 0 24px rgba(108, 71, 255, 0.3);
+    }
+
+    .btn-submit:hover {
+      background: var(--bb-purple-dark);
+      transform: translateY(-1px);
+    }
+
+    .privacy-note {
+      font-size: 0.72rem;
+      color: var(--bb-muted);
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .result-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 24px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      font-family: 'Sora', sans-serif;
+    }
+
+    .badge-green {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #15803D;
+    }
+
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #B45309;
+    }
+
+    .badge-blue {
+      background: rgba(108, 71, 255, 0.12);
+      border: 1px solid rgba(108, 71, 255, 0.3);
+      color: #4338CA;
+    }
+
+    .result-header h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .result-header p {
+      color: var(--bb-muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .score-meter {
+      background: var(--bb-surface);
+      border: 1px solid var(--bb-border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .score-meter-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .score-meter-label span:first-child {
+      font-size: 0.8rem;
+      color: var(--bb-muted);
+      font-weight: 500;
+    }
+
+    .score-pct {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--bb-purple);
+    }
+
+    .meter-track {
+      height: 6px;
+      background: rgba(0, 0, 0, 0.08);
+      border-radius: 3px;
+    }
+
+    .meter-fill {
+      height: 6px;
+      border-radius: 3px;
+      transition: width 1s ease;
+    }
+
+    .gaps-card {
+      background: var(--bb-surface);
+      border: 1px solid var(--bb-border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .gaps-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--bb-muted);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .gap-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--bb-border);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .gap-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .gap-icon {
+      font-size: 0.9rem;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .cta-card {
+      background: linear-gradient(135deg, rgba(108, 71, 255, 0.2), rgba(167, 139, 250, 0.1));
+      border: 1px solid rgba(108, 71, 255, 0.35);
+      border-radius: 14px;
+      padding: 1.75rem 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-card h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .cta-card p {
+      font-size: 0.875rem;
+      color: var(--bb-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    .btn-cta {
+      background: var(--bb-purple);
+      color: #fff;
+      border: none;
+      padding: 13px 28px;
+      border-radius: 9px;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      box-shadow: 0 0 24px rgba(108, 71, 255, 0.4);
+    }
+
+    .btn-cta:hover {
+      background: var(--bb-purple-dark);
+      transform: translateY(-1px);
+    }
+
+    .data-note {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      font-size: 0.82rem;
+      color: #15803D;
+      line-height: 1.6;
+    }
+
+    .data-note strong {
+      color: #166534;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: #FFFFFF;
+      border: 1px solid var(--bb-border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 480px;
+      width: 90%;
+      transform: translateY(20px);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0);
+    }
+
+    .modal h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .modal p {
+      font-size: 0.875rem;
+      color: var(--bb-muted);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .modal code {
+      display: block;
+      background: #F3F4F6;
+      border: 1px solid var(--bb-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.78rem;
+      color: var(--bb-purple-dark);
+      word-break: break-all;
+      margin: 0.5rem 0 1rem;
+      font-family: monospace;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-modal {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Sora', sans-serif;
+    }
+
+    .btn-modal-primary {
+      background: var(--bb-purple);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-modal-secondary {
+      background: transparent;
+      border: 1px solid var(--bb-border);
+      color: var(--bb-muted);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #22C55E;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+      font-family: 'Sora', sans-serif;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem 1rem 3rem;
+      }
+
+      .q-card {
+        padding: 1.5rem 1.25rem;
+      }
+
+      .stat-row {
+        gap: 1.5rem;
+      }
+
+      .header {
+        padding: 1rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="logo">
+      <img src="https://i.ibb.co/LzWjJntG/blackbucks-icon.jpg" alt="Blackbucks Logo">
+      <div>Blackbucks</div>
+    </div>
+    <div class="header-tag">B.Tech AI & Data Science</div>
+  </header>
+
+  <div class="container">
+
+    <!-- SCREEN 1: LANDING -->
+    <div class="screen active" id="screen-landing">
+      <div class="landing-hero">
+        <div class="landing-chip">Free Career Assessment · 3 mins</div>
+        <h1>Are you <em>actually ready</em> for an AI career?</h1>
+        <p>10 questions. Instant diagnosis. Find out exactly where you stand — and what you need to get placed in AI &
+          Data Science.</p>
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-num">3,000+</div>
+            <div class="stat-label">Companies hiring</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">10</div>
+            <div class="stat-label">Questions only</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">3 min</div>
+            <div class="stat-label">To complete</div>
+          </div>
+        </div>
+        <button class="btn-start" onclick="startQuiz()">Start Free Assessment <div class="icon-chevron-right"></div></button>
+        <p class="start-note">No login needed · 100% free</p>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: QUIZ -->
+    <div class="screen" id="screen-quiz">
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span class="progress-label" id="q-label">Question 1 of 10</span>
+          <span class="progress-label" id="q-pct">10%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="prog-fill" style="width:10%"></div>
+        </div>
+      </div>
+      <div class="q-card">
+        <div class="q-text" id="q-text"></div>
+        <div class="options-list" id="options-list"></div>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" id="btn-back" onclick="goBack()" disabled><div class="icon-chevron-left"></div> Back</button>
+        <button class="btn-next" id="btn-next" onclick="goNext()">Next <div class="icon-chevron-right"></div></button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: LEAD CAPTURE -->
+    <div class="screen" id="screen-lead">
+      <div class="lead-screen">
+        <div class="lead-icon">🎯</div>
+        <h2>Your report is ready!</h2>
+        <p>Enter your details below to unlock your personalized<br>AI Career Readiness Report</p>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="f-name" placeholder="e.g. Rahul Sharma" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number (WhatsApp)</label>
+          <input type="tel" id="f-phone" placeholder="e.g. 9876543210" />
+        </div>
+        <div class="form-group">
+          <label>College / School Name</label>
+          <input type="text" id="f-college" placeholder="e.g. VIT Vellore / Delhi Public School" />
+        </div>
+
+        <div class="form-group">
+          <label>Current Qualification</label>
+          <select id="f-qual">
+            <option value="">Select your qualification</option>
+            <option>12th pass / Appearing (2025)</option>
+            <option>Diploma holder</option>
+            <option>Preparing to join B.Tech</option>
+            <option>Currently in B.Tech</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" id="f-city" placeholder="e.g. Hyderabad" />
+        </div>
+        <button class="btn-submit" onclick="submitLead()">Unlock My Report <div class="icon-chevron-right"></div></button>
+        <p class="privacy-note">🔒 Your data is safe. A Blackbucks counsellor may reach out within 24 hours.</p>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: RESULT -->
+    <div class="screen" id="screen-result">
+      <div class="result-header">
+        <div class="result-badge" id="res-badge"></div>
+        <h2 id="res-title"></h2>
+        <p id="res-desc"></p>
+      </div>
+      <div class="score-meter">
+        <div class="score-meter-label">
+          <span>Your readiness score</span>
+          <span class="score-pct" id="res-pct">0%</span>
+        </div>
+        <div class="meter-track">
+          <div class="meter-fill" id="meter-fill" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="gaps-card">
+        <div class="gaps-title">Your key gaps to close</div>
+        <div id="res-gaps"></div>
+      </div>
+      <div class="cta-card">
+        <h3>Blackbucks B.Tech AI & Data Science</h3>
+        <p id="res-cta"></p>
+        <button class="btn-cta" onclick="openLink('https://blackbucks-ai-school-slxjk4b.gamma.site/')">See What Your First Semester Looks Like <div class="icon-chevron-right"></div></button>
+      </div>
+
+    </div>
+
+  </div><!-- /container -->
+
+  <!-- GOOGLE SHEETS SETUP MODAL -->
+  <div class="modal-overlay" id="sheets-modal">
+    <div class="modal">
+      <h3>📊 Connect to Google Sheets</h3>
+      <p>To automatically save every lead, follow these steps:</p>
+      <p><strong style="color:var(--bb-text)">Step 1:</strong> Create a new Google Sheet with these column headers in
+        Row 1:</p>
+      <code>Timestamp | Name | Phone | College | Qualification | City | Score | Result Type</code>
+      <p><strong style="color:var(--bb-text)">Step 2:</strong> Go to <strong style="color:#A78BFA">Extensions → Apps
+          Script</strong> and paste the doPost script.</p>
+      <p><strong style="color:var(--bb-text)">Step 3:</strong> Deploy as Web App → Who has access: Anyone → Copy the
+        URL.</p>
+      <div class="modal-btns">
+        <button class="btn-modal btn-modal-secondary" onclick="closeModal()">Got it</button>
+        <button class="btn-modal btn-modal-primary"
+          onclick="window.open('https://docs.google.com/spreadsheets/create','_blank');closeModal()">Open Google Sheets <div class="icon-chevron-right"></div></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================================
+    // ✅ FIXED: SHEETS_URL now has proper quotes around the string
+    // ============================================================
+    const SHEETS_URL = "https://script.google.com/macros/s/AKfycbw5rgnCoo6ksHIsMpYAsdap_jrORIWbDH9gGjC1qWQp-23Hq06okFHUanPDRr17Cdld/exec";
+    // ============================================================
+
+    const questions = [
+      { q: "Which of these have you heard of?", opts: ["Python", "R", "Neither"], scores: [2, 1, 0] },
+      { q: "How comfortable are you with math?", opts: ["Scared of it", "Okay with basics", "Comfortable with it"], scores: [0, 1, 2] },
+      { q: "Have you built any project — any kind?", opts: ["Yes, I've built one", "In progress", "No, not yet"], scores: [2, 1, 0] },
+      { q: "What's your biggest career fear?", opts: ["Not getting placed", "Choosing the wrong stream", "Not being good enough technically"], scores: [1, 1, 0] },
+      { q: "Which domain interests you most?", opts: ["Finance / FinTech", "Healthcare / MedTech", "EdTech", "Defense / Aerospace", "General IT"], scores: [2, 2, 2, 2, 1] },
+      { q: "How many hours a week can you commit to learning outside college?", opts: ["Less than 2 hrs", "2–5 hrs", "More than 5 hrs"], scores: [0, 1, 2] },
+      { q: "Have you heard of Machine Learning before?", opts: ["Yes, I know it well", "Heard of it", "No idea"], scores: [2, 1, 0] },
+      { q: "What matters most to you in a program?", opts: ["Placement guarantee", "Hands-on projects", "Reputed degree", "Industry mentors"], scores: [2, 2, 2, 2] },
+      { q: "What's your expected first salary goal?", opts: ["Below 5 LPA", "5–10 LPA", "10–20 LPA", "20+ LPA"], scores: [0, 1, 2, 2] }
+    ];
+
+    let cur = 0, answers = [], scores = [], leadData = {};
+
+    function startQuiz() {
+      showScreen('screen-quiz');
+      renderQ();
+    }
+
+    function renderQ() {
+      const q = questions[cur];
+      document.getElementById('q-label').textContent = `Question ${cur + 1} of ${questions.length}`;
+      document.getElementById('q-pct').textContent = `${Math.round(((cur + 1) / questions.length) * 100)}%`;
+      document.getElementById('prog-fill').style.width = `${((cur + 1) / questions.length) * 100}%`;
+      document.getElementById('q-text').textContent = q.q;
+      const ol = document.getElementById('options-list');
+      ol.innerHTML = '';
+      q.opts.forEach((o, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn' + (answers[cur] === i ? ' selected' : '');
+        b.innerHTML = `<span class="opt-dot"></span><span>${o}</span>`;
+        b.onclick = () => selectOpt(i);
+        ol.appendChild(b);
+      });
+      document.getElementById('btn-back').disabled = cur === 0;
+      const nn = document.getElementById('btn-next');
+      nn.innerHTML = cur === questions.length - 1 
+        ? 'Get My Report <div class="icon-chevron-right"></div>' 
+        : 'Next <div class="icon-chevron-right"></div>';
+      nn.className = 'btn-next' + (answers[cur] !== undefined ? ' enabled' : '');
+      lucide.createIcons();
+    }
+
+    function selectOpt(i) {
+      answers[cur] = i;
+      scores[cur] = questions[cur].scores[i];
+      document.querySelectorAll('.opt-btn').forEach((b, idx) => {
+        b.className = 'opt-btn' + (idx === i ? ' selected' : '');
+      });
+      document.getElementById('btn-next').className = 'btn-next enabled';
+    }
+
+    function goNext() {
+      if (answers[cur] === undefined) return;
+      if (cur < questions.length - 1) { cur++; renderQ(); }
+      else { showScreen('screen-lead'); }
+    }
+
+    function goBack() {
+      if (cur > 0) { cur--; renderQ(); }
+    }
+
+    function submitLead() {
+      const name = document.getElementById('f-name').value.trim();
+      const phone = document.getElementById('f-phone').value.trim();
+      const college = document.getElementById('f-college').value.trim();
+      const qual = document.getElementById('f-qual').value;
+      const city = document.getElementById('f-city').value.trim();
+
+      // Name validation
+      if (!name) { showToast('Please enter your name', 'error'); return; }
+      if (!/^[A-Za-z\s]+$/.test(name)) { showToast('Name should only contain letters and spaces', 'error'); return; }
+
+      // Phone validation
+      if (!phone || phone.length < 10) { showToast('Please enter a valid phone number (min 10 digits)', 'error'); return; }
+      if (!/^\d+$/.test(phone)) { showToast('Phone number must contain only numbers', 'error'); return; }
+
+      // College validation
+      if (!college) { showToast('Please enter your college name', 'error'); return; }
+      if (!/^[A-Za-z\s.,\'&-]+$/.test(college) || college.length < 3) { showToast('Please enter a valid college name', 'error'); return; }
+
+      // Qualification validation
+      if (!qual) { showToast('Please select your qualification', 'error'); return; }
+
+      leadData = { name, phone, college, qual, city };
+      saveToSheets(leadData);
+      showResult();
+    }
+
+    function showResult() {
+      const total = scores.reduce((a, b) => a + (b || 0), 0);
+      const max = questions.reduce((a, q) => a + Math.max(...q.scores), 0);
+      const pct = Math.round((total / max) * 100);
+
+      let type, badgeClass, badgeText, title, desc, gaps, cta;
+
+      if (pct >= 68) {
+        type = 'Strong Foundation';
+        badgeClass = 'badge-green';
+        badgeText = '✦ Strong Foundation';
+        title = "You're ready to go deep.";
+        desc = `${leadData.name}, you already have the right mindset and solid technical awareness. The next step is structured depth — real industry projects, expert mentors, and a degree that signals to 3,000+ hiring companies.`;
+        gaps = [
+          { icon: '⚡', text: 'Go deeper on Python, NumPy, and ML frameworks' },
+          { icon: '🏗️', text: 'Build a domain-specific capstone project for your portfolio' },
+          { icon: '🎯', text: 'Add a placement-linked program to convert your skills into a job offer' }
+        ];
+        cta = `You're close to job-ready. Blackbucks B.Tech AI & Data Science will take you from "promising" to "placed at 8–20 LPA."`;
+      } else if (pct >= 38) {
+        type = 'Building Phase';
+        badgeClass = 'badge-amber';
+        badgeText = '◆ Building Phase';
+        title = "You need the right structure.";
+        desc = `${leadData.name}, you have curiosity and some exposure — but you're missing a structured learning path. Without the right program, the gap between you and job-ready candidates will only grow.`;
+        gaps = [
+          { icon: '📐', text: 'Build foundational Python + applied math skills from scratch' },
+          { icon: '🛠️', text: 'Get real hands-on project experience with industry datasets' },
+          { icon: '🤝', text: 'Join a program with placement support and mentor guidance' }
+        ];
+        cta = `The building phase is the most critical moment. Blackbucks is built exactly for students at your stage — structured, project-first, placement-linked.`;
+      } else {
+        type = 'Start Fresh';
+        badgeClass = 'badge-blue';
+        badgeText = '◉ Start Fresh';
+        title = "You need a guided path from day one.";
+        desc = `${leadData.name}, you're at the starting line — and that's completely okay. The biggest risk isn't being behind; it's choosing the wrong program and wasting 4 years. You need a guided, structured path.`;
+        gaps = [
+          { icon: '🧭', text: 'Learn what AI & Data Science means for your career' },
+          { icon: '💻', text: 'Start with Python basics and applied math made simple' },
+          { icon: '🚀', text: 'Choose a program that takes you from zero to placed — step by step' }
+        ];
+        cta = `You don't need to figure this out alone. Blackbucks B.Tech AI & Data Science is designed for students starting from scratch — with mentors, structure, and placement guarantee.`;
+      }
+
+      showScreen('screen-result');
+
+      document.getElementById('res-badge').className = `result-badge ${badgeClass}`;
+      document.getElementById('res-badge').textContent = badgeText;
+      document.getElementById('res-title').textContent = title;
+      document.getElementById('res-desc').textContent = desc;
+      document.getElementById('res-cta').textContent = cta;
+
+      const meterColor = pct >= 68 ? '#22C55E' : pct >= 38 ? '#F59E0B' : '#6C47FF';
+      setTimeout(() => {
+        document.getElementById('res-pct').textContent = pct + '%';
+        document.getElementById('meter-fill').style.width = pct + '%';
+        document.getElementById('meter-fill').style.background = meterColor;
+      }, 200);
+
+      const gapsEl = document.getElementById('res-gaps');
+      gapsEl.innerHTML = gaps.map(g => `<div class="gap-item"><span class="gap-icon">${g.icon}</span><span>${g.text}</span></div>`).join('');
+
+
+    }
+
+    // ============================================================
+    // ✅ FIXED: Guard condition now correctly checks for empty string
+    //    Old (broken): if (SHEETS_URL === https://script...   ← no quotes, no closing paren
+    //    New (fixed):  if (!SHEETS_URL)                       ← clean and safe
+    // ============================================================
+    function saveToSheets(data) {
+      if (!SHEETS_URL) return;
+
+      const total = scores.reduce((a, b) => a + (b || 0), 0);
+      const max = questions.reduce((a, q) => a + Math.max(...q.scores), 0);
+      const pct = Math.round((total / max) * 100);
+      const type = pct >= 68 ? 'Strong Foundation' : pct >= 38 ? 'Building Phase' : 'Start Fresh';
+
+      // Build individual answer columns for each question
+      const answerCols = {};
+      questions.forEach((q, i) => {
+        answerCols[`q${i + 1}`] = answers[i] !== undefined ? q.opts[answers[i]] : '';
+      });
+
+      const payload = {
+        timestamp: new Date().toLocaleString('en-IN'),
+        name: data.name,
+        phone: data.phone,
+        college: data.college,
+        qualification: data.qual,
+        city: data.city,
+        score: pct + '%',
+        resultType: type,
+        ...answerCols
+      };
+
+      fetch(SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(() => { });
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+      const el = document.getElementById(id);
+      el.style.display = 'block';
+      requestAnimationFrame(() => el.classList.add('active'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.background = type === 'error' ? '#EF4444' : '#22C55E';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function openLink(url) { window.open(url, '_blank'); }
+    function closeModal() { document.getElementById('sheets-modal').classList.remove('open'); }
+  </script>
+</body>
+
+</html>

@@ -1,11 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Zap, RefreshCcw, ChevronRight, Cpu, Triangle, RotateCcw } from 'lucide-react';
+import { Play, Zap, RefreshCcw, ChevronRight, Cpu, Triangle, RotateCcw, Terminal } from 'lucide-react';
 import MazeMode from './components/MazeMode';
 import SurvivalMode from './components/SurvivalMode';
 import LoginScreen from './components/LoginScreen';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardView from './components/DashboardView';
+import ProfileView from './components/ProfileView';
+import LearnView from './components/LearnView';
+import AssessView from './components/AssessView';
+import PrepareView from './components/PrepareView';
+import GamesView from './components/GamesView';
+import JobsView from './components/JobsView';
+import StudyAbroadView from './components/StudyAbroadView';
+import CollegeView from './components/CollegeView';
 
 
 /* ── SCREEN GLITCH ─────────────────────────────────── */
@@ -86,7 +94,7 @@ const App = () => {
 
   const handleLaunchGame = (mode) => {
     startGame(mode);
-    setDashboardTab('Prepare');
+    setDashboardTab('Games');
   };
 
   return (
@@ -107,36 +115,62 @@ const App = () => {
         <DashboardLayout user={user} activeTab={dashboardTab} onTabChange={setDashboardTab}>
           
           {dashboardTab === 'Dashboard' && <DashboardView user={user} onNavigate={setDashboardTab} onLaunchGame={handleLaunchGame} />}
+          
+          {dashboardTab === 'Profile' && <ProfileView user={user} onNavigate={setDashboardTab} />}
 
-          {dashboardTab === 'Prepare' && (
-            <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: 'calc(100vh - 70px)', background: '#0f172a', overflow: 'hidden' }}>
-              <div className="crt-overlay" />
-              <Stars />
-              <Glitch active={shake} />
+          {dashboardTab === 'Learn' && <LearnView />}
 
-              <div style={corner('top-left')} />
-              <div style={corner('top-right')} />
-              <div style={corner('bottom-left')} />
-              <div style={corner('bottom-right')} />
+          {dashboardTab === 'Assess' && <AssessView />}
 
-              <AnimatePresence mode="wait">
-                {screen === 'start'    && <StartScreen    key="start" user={user} onStart={startGame} />}
-                {screen === 'maze'     && <MazeMode       key="maze" onGameOver={s => end(s,'gameover')} onVictory={s => end(s,'victory')} onIntensityChange={triggerShake} />}
-                {screen === 'survival' && <SurvivalMode   key="surv" onGameOver={s => end(s,'gameover')} onIntensityChange={triggerShake} />}
-                {(screen === 'gameover' || screen === 'victory') && (
-                  <EndScreen key="end" type={screen} score={score} onRestart={() => setScreen('start')} />
-                )}
-              </AnimatePresence>
-            </div>
+          {dashboardTab === 'Prepare' && screen === 'start' && <PrepareView onNavigate={setDashboardTab} onLaunchGame={handleLaunchGame} />}
+
+          {dashboardTab === 'Games' && screen === 'start' && <GamesView onLaunchGame={handleLaunchGame} />}
+
+          {['Prepare', 'Games'].includes(dashboardTab) && screen !== 'start' && (
+              <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: 'calc(100vh - 70px)', background: '#0f172a', overflow: 'hidden', borderRadius: '24px' }}>
+                <div className="crt-overlay" />
+                <Stars />
+                <Glitch active={shake} />
+
+                <div style={corner('top-left')} />
+                <div style={corner('top-right')} />
+                <div style={corner('bottom-left')} />
+                <div style={corner('bottom-right')} />
+
+                <AnimatePresence mode="wait">
+                  {screen === 'maze'     && <MazeMode       key="maze" onGameOver={s => end(s,'gameover')} onVictory={s => end(s,'victory')} onIntensityChange={triggerShake} />}
+                  {screen === 'survival' && <SurvivalMode   key="survival" onGameOver={s => end(s,'gameover')} onIntensityChange={triggerShake} />}
+                  {(screen === 'gameover' || screen === 'victory') && (
+                    <EndScreen key="end" type={screen} score={score} onRestart={() => setScreen('start')} />
+                  )}
+                </AnimatePresence>
+                
+                {/* Back to Prepare Hub button */}
+                <button 
+                  onClick={() => setScreen('start')}
+                  style={{ position: 'absolute', bottom: '24px', right: '24px', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', padding: '10px 20px', borderRadius: '12px', cursor: 'pointer', zIndex: 100 }}
+                >
+                  Exit Game
+                </button>
+              </div>
           )}
 
-          {dashboardTab !== 'Dashboard' && dashboardTab !== 'Prepare' && (
-            <div style={{ padding: '40px', textAlign: 'center', background: '#fff', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.03)' }}>
-               <h2 style={{ color: '#333' }}>{dashboardTab}</h2>
-               <p style={{ color: '#666' }}>This module is currently under development.</p>
+          {dashboardTab === 'Job Posts' && <JobsView />}
+
+          {dashboardTab === 'Study Abroad' && <StudyAbroadView />}
+
+          {dashboardTab === 'My College' && <CollegeView />}
+
+          {!['Dashboard', 'Profile', 'Learn', 'Assess', 'Prepare', 'Games', 'Job Posts', 'Study Abroad', 'My College'].includes(dashboardTab) && (
+            <div style={{ padding: '60px 40px', textAlign: 'center', background: '#fff', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+               <div style={{ width: '80px', height: '80px', background: '#f8fafc', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6366f1', margin: '0 auto 24px' }}>
+                  <Terminal size={40} />
+               </div>
+               <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#111827', margin: '0 0 12px 0' }}>{dashboardTab}</h2>
+               <p style={{ margin: '0 auto 32px auto', color: '#64748b', fontSize: '1.1rem', maxWidth: '400px' }}>This intelligence module is currently being calibrated. Check back soon for the full experience.</p>
+               <button onClick={() => setDashboardTab('Dashboard')} style={{ background: '#6366f1', color: '#fff', border: 'none', padding: '12px 32px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}>Return to Dashboard</button>
             </div>
           )}
-
         </DashboardLayout>
       )}
     </div>
