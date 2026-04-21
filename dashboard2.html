@@ -1,0 +1,5598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaPTaP — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ── Reset ─────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    /* Right chevron for links & buttons (replaces text arrows) */
+    .ic-chev {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    .ic-chev svg {
+      display: block;
+    }
+
+    @keyframes btn-shimmer {
+      0% {
+        left: -80%;
+      }
+
+      100% {
+        left: 120%;
+      }
+    }
+
+    /* ── Tokens (Eduler-inspired: lavender + warm coral, no flat white) ─ */
+    :root {
+      --bg: #e8e4f0;
+      --surface: #fbfaff;
+      --surface2: #f0ecfa;
+      --border: rgba(83, 74, 183, .12);
+      --border-h: rgba(83, 74, 183, .22);
+      --text: #1a1830;
+      --text2: #5c5878;
+      --text3: #8b879e;
+      --coral: #e85d4c;
+      --coral-lt: #fff0ec;
+      --coral-mid: #ff8a6b;
+      --purple: #534AB7;
+      --purple-lt: #EEEDFE;
+      --purple-mid: #7F77DD;
+      --purple-dk: #3C3489;
+      --green: #3B6D11;
+      --green-lt: #EAF3DE;
+      --green-mid: #639922;
+      --red: #A32D2D;
+      --red-lt: #FCEBEB;
+      --amber: #854F0B;
+      --amber-lt: #FAEEDA;
+      --amber-mid: #EF9F27;
+      --teal: #0F6E56;
+      --teal-lt: #E1F5EE;
+      --blue-lt: #E6F1FB;
+      --blue-dk: #0C447C;
+      --r-sm: 6px;
+      --r-md: 8px;
+      --r-lg: 12px;
+      --r-xl: 16px;
+      --r-card: 14px;
+      --card-pad-y: 1.25rem;
+      --card-pad-x: 1.5rem;
+      --card-shadow: 0 2px 12px rgba(83, 74, 183, .08), 0 1px 3px rgba(40, 30, 90, .05);
+    }
+
+    /* ── Base ──────────────────────────────────────────── */
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background:
+        radial-gradient(ellipse 120% 70% at 100% -10%, rgba(108, 92, 231, .18) 0%, transparent 52%),
+        radial-gradient(ellipse 90% 55% at 0% 105%, rgba(232, 93, 76, .12) 0%, transparent 48%),
+        radial-gradient(ellipse 60% 45% at 45% 40%, rgba(99, 153, 34, .06) 0%, transparent 42%),
+        linear-gradient(165deg, #e4dff5 0%, #ebe7f6 35%, #f0ecf8 100%);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ────────────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      min-height: 100vh;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .content {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .grid-6 {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    /* ── Band progression redesign ─────────────────────── */
+    .band-prog-track {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      position: relative;
+      padding: 0 4px;
+      margin: 0.5rem 0 1.25rem;
+    }
+
+    .band-prog-line {
+      position: absolute;
+      top: 18px;
+      left: 4px;
+      right: 4px;
+      height: 2px;
+      background: var(--surface2);
+      border-radius: 99px;
+      z-index: 0;
+    }
+
+    .band-prog-line-fill {
+      position: absolute;
+      top: 18px;
+      left: 4px;
+      height: 2px;
+      background: var(--purple-mid);
+      border-radius: 99px;
+      z-index: 1;
+      width: 35%;
+    }
+
+    .band-node {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .band-node-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .bnode-done {
+      background: var(--red-lt);
+      border: 2px solid #E24B4A;
+      color: var(--red);
+    }
+
+    .bnode-skip {
+      background: var(--surface2);
+      border: 1.5px dashed var(--border-h);
+      color: var(--text3);
+      opacity: .5;
+    }
+
+    .bnode-active {
+      background: var(--purple-lt);
+      border: 2px solid var(--purple-mid);
+      color: var(--purple-dk);
+    }
+
+    .bnode-next {
+      background: var(--surface2);
+      border: 1.5px dashed var(--amber-mid);
+      color: var(--amber);
+      opacity: .65;
+    }
+
+    .bnode-locked {
+      background: var(--surface2);
+      border: 1.5px dashed var(--border-h);
+      color: var(--text3);
+      opacity: .3;
+    }
+
+    .band-node-badge {
+      position: absolute;
+      left: 50%;
+      bottom: -4px;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--purple);
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .band-node-lbl {
+      font-size: 11px;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .band-node-sub {
+      font-size: 10px;
+      color: var(--text3);
+      text-align: center;
+    }
+
+    .band-prog-dek {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 4px;
+      line-height: 1.45;
+      max-width: 40rem;
+    }
+
+    .band-node.skip .band-node-lbl {
+      opacity: .5;
+    }
+
+    /* ── Bands popup ────────────────────────────────────── */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 24, 48, .48);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .popup-overlay.open {
+      display: flex;
+    }
+
+    .popup-box {
+      background: linear-gradient(165deg, #fdfcff 0%, #f4effc 100%);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-xl);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(60, 52, 137, .22);
+    }
+
+    .popup-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .popup-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .popup-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text2);
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .popup-body {
+      padding: 1.25rem 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .popup-band-group {
+      display: flex;
+      flex-direction: column;
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .6) 0%, var(--surface2) 100%);
+    }
+
+    .popup-band-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.875rem 1rem;
+      padding: 0.85rem 1rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .popup-band-group .popup-band-row:last-child {
+      border-bottom: none;
+    }
+
+    .popup-band-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .popup-band-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .popup-band-name {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .popup-band-range {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.35;
+    }
+
+    .popup-band-score {
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.45;
+    }
+
+    .popup-band-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-weight: 500;
+      flex-shrink: 0;
+      align-self: center;
+      white-space: nowrap;
+    }
+
+    .popup-band-nudge {
+      margin-top: 1rem;
+      padding: 0.875rem 1rem;
+      background: var(--amber-lt);
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .popup-band-current {
+      background: var(--purple-lt);
+      border: 1.5px solid var(--purple-mid);
+    }
+
+    .popup-band-current .popup-band-circle {
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      border: 2px solid var(--purple-mid);
+    }
+
+    .popup-band-current .popup-band-name {
+      color: var(--purple-dk);
+    }
+
+    /* ── Mobile nav bar (bottom) ────────────────────────── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+      padding: .5rem 0 calc(.5rem + env(safe-area-inset-bottom));
+      z-index: 20;
+      justify-content: space-around;
+    }
+
+    .mnav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: .25rem .75rem;
+      border-radius: var(--r-md);
+      font-size: 10px;
+      color: var(--text3);
+      cursor: pointer;
+      transition: color .15s;
+    }
+
+    .mnav-item.active {
+      color: var(--purple);
+    }
+
+    .mnav-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── Mobile responsive ──────────────────────────────── */
+    @media (max-width:768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mobile-nav {
+        display: flex;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .content {
+        padding: 1rem;
+        gap: 1.25rem;
+        padding-bottom: 5rem;
+      }
+
+      .rc-wrap {
+        padding: 0 1rem 5rem;
+        gap: 1.25rem;
+      }
+
+      .topbar {
+        padding: 0 1rem;
+      }
+
+      .score-pill {
+        display: none;
+      }
+
+      .dash-hero-primary .si-panel>.si-banner--claim,
+      .dash-hero-primary .si-panel>.si-banner--active {
+        flex: none;
+      }
+
+      .dash-actions-row {
+        grid-template-columns: 1fr;
+      }
+
+      .dash-act-met-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+
+      .promo-card__body {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .promo-card__body-aside {
+        align-items: stretch;
+      }
+
+      .si-btn-claim {
+        width: 100%;
+      }
+
+      .si-active-footer {
+        flex-direction: column;
+      }
+
+      .si-btn-primary,
+      .si-btn-outline {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .si-active-body {
+        flex-direction: column;
+      }
+
+      .profile-banner {
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem;
+      }
+
+      .p-stats {
+        gap: 1.25rem;
+      }
+
+      .ps-val {
+        font-size: 17px;
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .grid-6 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .badges-row {
+        gap: .75rem;
+      }
+
+      .badge-prog {
+        min-width: unset;
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .cotd-q {
+        font-size: 12px;
+      }
+
+      .qgrid {
+        grid-template-columns: 1fr;
+      }
+
+      .skills-cols {
+        grid-template-columns: 1fr;
+      }
+
+      .rc-ctrls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .rc-table th,
+      .rc-table td {
+        font-size: 11px;
+        padding: 7px 4px;
+        min-width: 52px;
+      }
+
+      .rc-table th.cc,
+      .rc-table td.cc {
+        min-width: 120px;
+      }
+
+      .hmap-inner {
+        min-width: 520px;
+      }
+
+      .band-prog-track {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .band-node {
+        min-width: 56px;
+      }
+    }
+
+    /* ── Animations ────────────────────────────────────── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .a1 {
+      animation: fadeUp .35s ease both;
+    }
+
+    .a2 {
+      animation: fadeUp .35s .07s ease both;
+    }
+
+    .a3 {
+      animation: fadeUp .35s .14s ease both;
+    }
+
+    .a4 {
+      animation: fadeUp .35s .21s ease both;
+    }
+
+    /* ── Sidebar ───────────────────────────────────────── */
+    .sidebar {
+      background: linear-gradient(180deg, #f6f3ff 0%, #ebe6fc 55%, #e4def8 100%);
+      border-right: 0.5px solid var(--border);
+      padding: 1.25rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 4px 0 24px rgba(83, 74, 183, .09);
+    }
+
+    .sidebar-logo {
+      padding: 0 1rem 1rem;
+      border-bottom: 0.5px solid var(--border);
+      margin-bottom: .5rem;
+    }
+
+    .logo-name {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .logo-sub {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .nav-sec {
+      font-size: 10px;
+      color: var(--text3);
+      padding: 8px 1rem 4px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 1rem;
+      font-size: 13px;
+      color: var(--text2);
+      border-left: 2px solid transparent;
+      transition: background .15s, color .15s;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, .55);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(238, 237, 254, .95) 0%, rgba(255, 255, 255, .35) 100%);
+      color: var(--purple-dk);
+      border-left-color: var(--purple-mid);
+      font-weight: 500;
+    }
+
+    .nav-icon {
+      width: 16px;
+      height: 16px;
+      opacity: .6;
+      flex-shrink: 0;
+    }
+
+    .nav-item.active .nav-icon {
+      opacity: 1;
+    }
+
+    /* ── Topbar ────────────────────────────────────────── */
+    .topbar {
+      background: linear-gradient(180deg, rgba(253, 252, 255, .92) 0%, rgba(245, 241, 255, .88) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 0.5px solid var(--border);
+      padding: 0 1.5rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 1px 0 rgba(83, 74, 183, .06);
+    }
+
+    .tb-l {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tb-r {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pg-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .score-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      border-radius: 99px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      transition: border-color .15s;
+    }
+
+    .score-pill:hover {
+      border-color: var(--border-h);
+    }
+
+    .score-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple-mid);
+      flex-shrink: 0;
+    }
+
+    .score-dot--muted {
+      background: var(--text3);
+    }
+
+    .score-dot--amber {
+      background: var(--amber-mid);
+    }
+
+    .score-pill--met-none {
+      color: var(--text2);
+    }
+
+    .score-pill--met-due {
+      border-color: rgba(239, 159, 39, .35);
+      background: var(--amber-lt);
+      color: var(--amber);
+    }
+
+    .score-pill--met-ok {
+      color: var(--text);
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--purple-lt);
+      color: var(--purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ── Shared card ───────────────────────────────────── */
+    .card {
+      background: linear-gradient(165deg, #fdfcff 0%, #f8f5ff 48%, #faf7fd 100%);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-card);
+      padding: var(--card-pad-y) var(--card-pad-x);
+      box-shadow: var(--card-shadow);
+    }
+
+    .card--promo {
+      background: var(--purple);
+      border-color: rgba(0, 0, 0, .06);
+      box-shadow: 0 4px 14px rgba(83, 74, 183, .25), 0 2px 6px rgba(0, 0, 0, .06);
+    }
+
+    .card--inset {
+      background: var(--surface2);
+      border-radius: var(--r-md);
+      border: 0.5px solid var(--border);
+      padding: 1rem 1.25rem;
+      box-shadow: none;
+    }
+
+    .card-btn {
+      cursor: pointer;
+      transition: border-color .15s, transform .15s, box-shadow .15s;
+    }
+
+    .card-btn:hover {
+      border-color: var(--border-h);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    }
+
+    .sec-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .sec-ttl {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .sec-lnk {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      color: var(--purple);
+    }
+
+    .sec-lnk:hover {
+      text-decoration: underline;
+    }
+
+    .card-lbl {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+
+    .card-val {
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    /* ── Buttons (aligned with button_preview.html: shimmer + gradients) ─ */
+    .btn-purple,
+    .si-btn-primary,
+    .cotd-solve,
+    .rc-dl {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 90px;
+      font-weight: 600;
+      border: none;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(182deg, #A89BFC 2%, #6C5CE7 98%);
+      box-shadow:
+        0 3px 5px rgba(108, 92, 231, 0.22),
+        inset 0 1px 1px rgba(255, 255, 255, 0.18),
+        inset 0 -2px 2px rgba(72, 52, 180, 0.60);
+      background-clip: padding-box;
+    }
+
+    .btn-purple {
+      padding: 7px 16px;
+      font-size: 13px;
+    }
+
+    .si-btn-primary {
+      flex: 2;
+      min-width: 0;
+      padding: 8px 14px;
+      font-size: 12px;
+    }
+
+    .cotd-solve {
+      font-size: 12px;
+      padding: 6px 14px;
+    }
+
+    .btn-purple::before,
+    .si-btn-primary::before,
+    .cotd-solve::before,
+    .rc-dl::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -80%;
+      width: 70%;
+      height: 140%;
+      pointer-events: none;
+      transform: skewX(-20deg);
+      background: linear-gradient(120deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.28) 40%,
+          rgba(255, 255, 255, 0.10) 60%,
+          rgba(255, 255, 255, 0) 100%);
+    }
+
+    .btn-purple:hover::before,
+    .si-btn-primary:hover::before,
+    .cotd-solve:hover::before,
+    .rc-dl:hover::before {
+      animation: btn-shimmer 1s ease forwards;
+    }
+
+    .btn-purple:hover,
+    .si-btn-primary:hover,
+    .cotd-solve:hover,
+    .rc-dl:hover {
+      box-shadow:
+        0 6px 14px rgba(108, 92, 231, 0.35),
+        inset 0 1px 1px rgba(255, 255, 255, 0.18),
+        inset 0 -2px 2px rgba(72, 52, 180, 0.60);
+    }
+
+    .btn-purple:active,
+    .si-btn-primary:active,
+    .cotd-solve:active,
+    .rc-dl:active {
+      transform: scale(0.97);
+      box-shadow:
+        0 2px 4px rgba(108, 92, 231, 0.20),
+        inset 0 -3px 3px rgba(72, 52, 180, 0.48);
+    }
+
+    .si-btn-claim,
+    .si-btn-outline,
+    .btn-dash-secondary,
+    .rc-view {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 90px;
+      font-weight: 600;
+      border: none;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      color: #6C5CE7;
+      background: linear-gradient(180deg, #F4F2FF 0%, #EAE6FF 100%);
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.06),
+        inset 0 -3px 2px rgba(156, 147, 251, 0.14);
+    }
+
+    .si-btn-claim {
+      width: auto;
+      white-space: nowrap;
+      padding: 8px 16px;
+      font-size: 12px;
+      gap: 6px;
+    }
+
+    .si-btn-outline {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .btn-dash-secondary {
+      width: 100%;
+      margin-top: 2px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: #6C5CE7;
+    }
+
+    .si-btn-claim::before,
+    .si-btn-outline::before,
+    .btn-dash-secondary::before,
+    .rc-view::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -80%;
+      width: 70%;
+      height: 140%;
+      pointer-events: none;
+      transform: skewX(-20deg);
+      background: linear-gradient(120deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(200, 190, 255, 0.55) 45%,
+          rgba(180, 168, 255, 0.28) 60%,
+          rgba(255, 255, 255, 0) 100%);
+    }
+
+    .si-btn-claim:hover::before,
+    .si-btn-outline:hover::before,
+    .btn-dash-secondary:hover::before,
+    .rc-view:hover::before {
+      animation: btn-shimmer 1s ease forwards;
+    }
+
+    .si-btn-claim:hover,
+    .si-btn-outline:hover,
+    .btn-dash-secondary:hover,
+    .rc-view:hover {
+      box-shadow:
+        0 4px 10px rgba(108, 92, 231, 0.14),
+        inset 0 -3px 2px rgba(156, 147, 251, 0.20);
+    }
+
+    .si-btn-claim:active,
+    .si-btn-outline:active,
+    .btn-dash-secondary:active,
+    .rc-view:active {
+      transform: scale(0.96);
+      box-shadow:
+        0 3px 5px rgba(0, 0, 0, 0.10),
+        inset 0 -3px 3px rgba(156, 147, 251, 0.28);
+    }
+
+    button.inactive-button,
+    button:disabled,
+    .btn-inactive {
+      background: linear-gradient(180deg, #ebe8f4 0%, #ddd8ec 100%) !important;
+      color: #a39eb8 !important;
+      cursor: not-allowed !important;
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.05),
+        inset 0 -3px 2px rgba(206, 210, 214, 0.16) !important;
+      pointer-events: none;
+    }
+
+    button.inactive-button::before,
+    button:disabled::before,
+    .btn-inactive::before {
+      display: none;
+    }
+
+    .bar-bg {
+      flex: 1;
+      height: 5px;
+      background: var(--surface2);
+      border-radius: 99px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .6s ease;
+    }
+
+    /* ── Smart Interview + Resume (horizontal row, theme-aligned) ─ */
+    [hidden] {
+      display: none !important;
+    }
+
+    .si-panel {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Dashboard above-the-fold (hero + actions) ─ */
+    .dash-atf {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      min-width: 0;
+    }
+
+    .dash-intro {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      max-width: 42rem;
+    }
+
+    .dash-intro__title {
+      font-size: clamp(1.15rem, 2.5vw, 1.35rem);
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -.02em;
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .dash-intro__sub {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text2);
+      margin: 0;
+    }
+
+    .dash-act-met {
+      padding: 0 0 0.65rem;
+      margin-bottom: 0.35rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .dash-act-met-main {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.35rem 0.65rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .dash-act-met-hint {
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.4;
+      margin: 0 0 0.45rem;
+    }
+
+    .dash-act-met-hint strong {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .dash-act-met-lnk {
+      font-size: 11px;
+    }
+
+    .met-act-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .met-act-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0.5rem;
+    }
+
+    .met-act-badge {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 99px;
+      border: 0.5px solid var(--border);
+      color: var(--text2);
+      background: var(--surface2);
+    }
+
+    .met-act-badge--due {
+      color: var(--amber);
+      background: var(--amber-lt);
+      border-color: rgba(239, 159, 39, .35);
+    }
+
+    .met-act-badge--ok {
+      color: var(--purple-dk);
+      background: var(--purple-lt);
+      border-color: rgba(127, 119, 221, .35);
+    }
+
+    .met-act-last {
+      font-size: 11px;
+      color: var(--text2);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .met-act-last strong {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .dash-stat-lbl {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .dash-stat-val {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -.02em;
+    }
+
+    .dash-stat-meta {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--purple-dk);
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--purple-lt);
+    }
+
+    .dash-stat-link {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--purple);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity .15s;
+    }
+
+    .dash-stat-link:hover {
+      opacity: .85;
+    }
+
+    .dash-hero-primary {
+      min-width: 0;
+      width: 100%;
+    }
+
+    /* Space below Smart Interview card when claim state is showing */
+    .dash-hero-primary:has(#si-state-claim:not([hidden])) {
+      margin-bottom: 0.75rem;
+    }
+
+    .dash-hero-primary .si-panel>.si-banner--claim,
+    .dash-hero-primary .si-panel>.si-banner--active {
+      flex: 0 0 auto;
+    }
+
+    /* Smart Interview: compact card with a bit more room */
+    .si-banner--hero.si-banner--claim {
+      padding: 0.85rem 1.1rem 1.15rem;
+      gap: 0.55rem;
+    }
+
+    .si-banner--hero .si-claim-head {
+      gap: 0.5rem;
+    }
+
+    .si-banner--hero .si-claim-title {
+      font-size: 14px;
+    }
+
+    .si-banner--hero .si-badge-free {
+      padding: 3px 8px;
+      font-size: 9px;
+    }
+
+    .si-banner--hero .promo-card__body {
+      gap: 0.55rem 0.85rem;
+      align-items: center;
+    }
+
+    .si-banner--hero .si-claim-desc {
+      font-size: 12px;
+      line-height: 1.4;
+      margin: 0 0 0.2rem;
+    }
+
+    .si-claim-meta {
+      font-size: 11px;
+      line-height: 1.35;
+      color: rgba(255, 255, 255, .72);
+      margin: 0;
+    }
+
+    .si-banner--hero .si-btn-claim {
+      padding: 7px 14px;
+      font-size: 12px;
+      gap: 5px;
+    }
+
+    .si-banner--hero.si-banner--active {
+      padding:  1.3rem ;
+      gap: 0.55rem;
+    }
+
+    .si-banner--hero .si-active-title {
+      font-size: 14px;
+    }
+
+    .si-banner--hero .si-badge-free--light {
+      padding: 3px 8px;
+      font-size: 9px;
+    }
+
+    .si-banner--hero .si-active-sub {
+      font-size: 11px;
+      margin: 0;
+    }
+
+    .si-banner--hero .si-active-body {
+      gap: 0.55rem;
+      margin: 0;
+    }
+
+    .si-banner--hero .si-credits-big {
+      font-size: 1.2rem;
+    }
+
+    .si-banner--hero .si-credits-lbl {
+      font-size: 10px;
+    }
+
+    .si-banner--hero .si-rollover-box {
+      padding: 7px 10px;
+    }
+
+    .si-banner--hero .si-rollover-l,
+    .si-banner--hero .si-rollover-r {
+      font-size: 11px;
+    }
+
+    .si-banner--hero .si-active-footer {
+      gap: 8px;
+      margin-top: 0;
+    }
+
+    .si-banner--hero .si-btn-primary,
+    .si-banner--hero .si-btn-outline {
+      padding: 7px 13px;
+      font-size: 12px;
+    }
+
+    .dash-actions-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .dash-atf-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .dash-activities {
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-width: 0;
+    }
+
+    .dash-act-hdr {
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .dash-act-ttl {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text2);
+      letter-spacing: .02em;
+    }
+
+    .dash-act-lede {
+      font-size: 11px;
+      color: var(--text3);
+      margin: 0.35rem 0 0;
+      line-height: 1.35;
+    }
+
+    .dash-act-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.55rem 0;
+      border-bottom: 0.5px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: background .12s;
+      border-radius: var(--r-sm);
+      margin: 0 -0.35rem;
+      padding-left: 0.35rem;
+      padding-right: 0.35rem;
+    }
+
+    .dash-act-item:last-of-type {
+      border-bottom: none;
+    }
+
+    .dash-act-item:hover {
+      background: var(--surface2);
+    }
+
+    .dash-act-ic {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .dash-act-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .dash-act-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.25;
+    }
+
+    .dash-act-sub {
+      font-size: 11px;
+      color: var(--text2);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .dash-act-cta {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--purple);
+      align-self: center;
+      white-space: nowrap;
+    }
+
+    .dash-act-block {
+      padding: 0.5rem 0 0.35rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .dash-act-block-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .dash-act-block-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .dash-act-all {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--purple);
+      white-space: nowrap;
+    }
+
+    .dash-act-all:hover {
+      text-decoration: underline;
+    }
+
+    .dash-act-course {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .dash-act-course:last-child {
+      margin-bottom: 0;
+    }
+
+    .dash-act-cn {
+      width: 26px;
+      height: 26px;
+      border-radius: var(--r-sm);
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dash-act-cw {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dash-act-ct {
+      font-size: 10px;
+      color: var(--text2);
+      line-height: 1.25;
+      display: block;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dash-act-cw .cprog-bg {
+      height: 3px;
+    }
+
+    .dash-act-pct {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text3);
+      width: 2rem;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .dash-act-item--resume {
+      margin-top: 0.15rem;
+      border-bottom: none;
+      padding-top: 0.45rem;
+    }
+
+    .dash-atf-stack>.card.profile-banner {
+      min-width: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.65rem;
+    }
+
+    .dash-actions-row .profile-banner__top {
+      align-items: flex-start;
+    }
+
+    .dash-actions-row .profile-banner .av-ring {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      --ring-r: 22.75px;
+    }
+
+    .dash-actions-row .profile-banner .av-ring svg {
+      width: 56px;
+      height: 56px;
+    }
+
+    .dash-actions-row .profile-banner .av-init {
+      width: 35px;
+      height: 35px;
+      font-size: 12px;
+    }
+
+    .dash-actions-row .profile-banner .p-info {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+    }
+
+    .dash-actions-row .profile-banner .p-name {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    .dash-actions-row .profile-banner .p-verified-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .dash-actions-row .profile-banner .p-role {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.35;
+    }
+
+    .dash-actions-row .profile-banner .p-role-row {
+      margin-top: 3px;
+    }
+
+    .dash-actions-row .profile-banner .p-tag--explorer {
+      font-size: 9px;
+      padding: 2px 7px;
+    }
+
+    .dash-actions-row .profile-banner .p-social {
+      margin-top: 6px;
+    }
+
+    .dash-actions-row .profile-banner .p-prog {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      margin-top: 0;
+      width: 100%;
+    }
+
+    .dash-actions-row .profile-banner .prog-bar {
+      width: 100%;
+      max-width: none;
+    }
+
+    .dash-actions-row .profile-banner .prog-lbl {
+      font-size: 11px;
+    }
+
+    .dash-actions-row .profile-banner .btn-profile-cta {
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #met-performance-card,
+    #practice-solve-card,
+    #practice-section,
+    #qstats,
+    #cotd-section,
+    #si-dashboard-card,
+    #profile-card-dash,
+    #my-courses-section {
+      scroll-margin-top: 72px;
+    }
+
+    .si-banner--claim {
+      border-radius: var(--r-card);
+      padding: 1.15rem 1.25rem 1.1rem;
+      background: linear-gradient(135deg, #6A62D4 0%, var(--purple) 48%, #43398f 100%);
+      border: 0.5px solid rgba(255, 255, 255, .14);
+      box-shadow: var(--card-shadow);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .si-claim-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .si-claim-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      letter-spacing: -.01em;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .si-badge-free {
+      flex-shrink: 0;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      padding: 4px 9px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, .2);
+      color: #fff;
+      border: 0.5px solid rgba(255, 255, 255, .22);
+    }
+
+    .promo-card__body {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem 1.25rem;
+    }
+
+    .promo-card__body-main {
+      flex: 1;
+      min-width: min(180px, 100%);
+    }
+
+    .promo-card__body-aside {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+
+    .si-claim-desc {
+      font-size: 12px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, .88);
+      margin: 0 0 0.5rem;
+    }
+
+    .si-claim-features {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0.75rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .si-claim-features li {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, .9);
+      line-height: 1.35;
+    }
+
+    .si-claim-features li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .55);
+      flex-shrink: 0;
+    }
+
+    .si-banner--active {
+      border-radius: var(--r-card);
+      padding: 1.1rem 1.2rem 1rem;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .si-active-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0;
+    }
+
+    .si-active-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .si-badge-free--light {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: .05em;
+      padding: 4px 9px;
+      border-radius: 99px;
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      border: 0.5px solid rgba(127, 119, 221, .3);
+    }
+
+    .si-active-sub {
+      font-size: 11px;
+      color: var(--text2);
+      margin: 0;
+    }
+
+    .si-active-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      margin-bottom: 0;
+      flex-wrap: wrap;
+    }
+
+    .si-credits-block {
+      min-width: 72px;
+    }
+
+    .si-credits-big {
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+
+    .si-credits-lbl {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .si-rollover-box {
+      flex: 1;
+      min-width: min(160px, 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--r-md);
+      border: 0.5px solid rgba(127, 119, 221, .35);
+      background: var(--purple-lt);
+    }
+
+    .si-rollover-l {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--purple-dk);
+    }
+
+    .si-rollover-l svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .si-rollover-r {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .si-active-footer {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ── Profile banner ────────────────────────────────── */
+    .profile-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.65rem;
+    }
+
+    .av-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+      --av-pct: 0.68;
+      --ring-r: 26px;
+    }
+
+    .av-ring svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .av-init {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 0.5px var(--border);
+      color: var(--purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .p-info {
+      flex: 1;
+    }
+
+    .p-name-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .p-name {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .p-verified {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 0;
+    }
+
+    .p-verified-icon {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .p-role-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 8px;
+      margin-top: 4px;
+    }
+
+    .p-role {
+      font-size: 13px;
+      color: var(--text2);
+      margin-top: 0;
+    }
+
+    .p-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 99px;
+      line-height: 1.2;
+    }
+
+    .p-tag--explorer {
+      background: var(--teal-lt);
+      color: var(--teal);
+      border: 0.5px solid rgba(15, 110, 86, .22);
+    }
+
+    .p-prog {
+      margin-top: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .prog-bar {
+      width: 100%;
+      max-width: none;
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 99px;
+    }
+
+    .prog-fill {
+      height: 100%;
+      width: 28%;
+      border-radius: 99px;
+      background: var(--purple);
+    }
+
+    .prog-lbl {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .p-stats {
+      display: flex;
+      gap: 2rem;
+      flex-shrink: 0;
+    }
+
+    .ps-val {
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .ps-lbl {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .profile-banner__top {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .p-social {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .p-social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--r-md);
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      color: var(--text2);
+      text-decoration: none;
+      transition: border-color .15s, color .15s, background .15s, transform .15s;
+    }
+
+    .p-social-link:hover {
+      border-color: var(--purple-mid);
+      color: var(--purple);
+      background: var(--purple-lt);
+      transform: translateY(-1px);
+    }
+
+    .p-social-link svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .btn-profile-cta {
+      width: 100%;
+      margin-top: 2px;
+    }
+
+    /* ── Badges ────────────────────────────────────────── */
+    .badges-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .badge-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .badge-earned {
+      background: var(--purple-lt);
+      border: 2px solid var(--purple-mid);
+    }
+
+    .badge-locked {
+      background: var(--surface2);
+      border: 1.5px dashed var(--border-h);
+      opacity: .4;
+    }
+
+    .badge-check {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--green-mid);
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .badge-lbl {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text2);
+      text-align: center;
+      max-width: 60px;
+      line-height: 1.3;
+    }
+
+    .badge-lbl.dim {
+      font-weight: 400;
+      color: var(--text3);
+    }
+
+    .badge-prog {
+      margin-left: auto;
+      background: var(--surface2);
+      border-radius: var(--r-md);
+      padding: .75rem 1rem;
+      min-width: 180px;
+    }
+
+    .bp-title {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .bp-bar {
+      height: 4px;
+      background: var(--border-h);
+      border-radius: 99px;
+      margin-bottom: 5px;
+    }
+
+    .bp-fill {
+      height: 100%;
+      width: 16%;
+      background: var(--purple);
+      border-radius: 99px;
+    }
+
+    .bp-hint {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* ── MET card ──────────────────────────────────────── */
+    .met-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .met-lbl {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .met-badge {
+      font-size: 11px;
+      padding: 3px 9px;
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    .met-score {
+      font-size: 34px;
+      font-weight: 500;
+    }
+
+    .met-score-s {
+      font-size: 15px;
+      color: var(--text3);
+      font-weight: 400;
+    }
+
+    .met-band {
+      font-size: 13px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .met-mets-line {
+      font-size: 12px;
+      color: var(--text2);
+      margin: 0.65rem 0 0.85rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .met-mets-line strong {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .met-cta {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--purple);
+    }
+
+    .met-cta:hover {
+      text-decoration: underline;
+    }
+
+    .met-perf-note {
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.45;
+      margin: 0 0 1rem;
+    }
+
+    .met-block--latest {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .met-block-hd {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text3);
+      margin-bottom: 0.45rem;
+    }
+
+    .met-score--secondary {
+      font-size: 26px;
+      font-weight: 500;
+    }
+
+    .score-flag {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--text3);
+      margin-left: 4px;
+    }
+
+    .met-card-panel {
+      min-height: 0;
+    }
+
+    .met-empty-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1.5px dashed var(--border-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0.25rem 0 0.75rem;
+      color: var(--text3);
+    }
+
+    .met-empty-lead {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0 0 0.35rem;
+      line-height: 1.35;
+    }
+
+    .met-empty-desc {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.45;
+      margin: 0 0 0.75rem;
+    }
+
+    .met-badge--muted {
+      background: var(--surface2);
+      color: var(--text2);
+      border: 0.5px solid var(--border);
+    }
+
+    .met-badge--due {
+      background: var(--amber-lt);
+      color: var(--amber);
+    }
+
+    .met-due-summary {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.45;
+      margin: 0.35rem 0 0.85rem;
+      padding: 0.65rem 0.75rem;
+      background: var(--amber-lt);
+      border-radius: var(--r-md);
+      border: 0.5px solid rgba(239, 159, 39, .25);
+    }
+
+    .met-due-summary strong {
+      color: var(--text);
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .score-name {
+      font-size: 12px;
+      color: var(--text2);
+      width: 62px;
+    }
+
+    .score-pct {
+      font-size: 12px;
+      color: var(--text2);
+      width: 32px;
+      text-align: right;
+    }
+
+    /* ── Practice dots ─────────────────────────────────── */
+    .diff-dots {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .diff-dot-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .diff-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .diff-dot-lbl {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* ── Jobs mini ─────────────────────────────────────── */
+    .jobs-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .jobs-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--r-md);
+      background: var(--teal-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .short-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: 11px;
+      background: var(--teal-lt);
+      color: var(--teal);
+      padding: 3px 9px;
+      border-radius: 99px;
+    }
+
+    /* ── Rank card ─────────────────────────────────────── */
+    .rank-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .rank-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--r-md);
+      background: var(--purple-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rank-val {
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .rank-lbl {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .rank-side {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    /* ── Bands card ────────────────────────────────────── */
+    .bands-hdr {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 10px;
+    }
+
+    .band-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .band-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .band-name {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .band-chip {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    .band-f {
+      background: var(--red-lt);
+      color: var(--red);
+    }
+
+    .band-d {
+      background: var(--amber-lt);
+      color: var(--amber);
+    }
+
+    .band-c {
+      background: var(--coral-lt);
+      color: #633806;
+    }
+
+    .band-b {
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+    }
+
+    .band-a {
+      background: var(--green-lt);
+      color: var(--green);
+    }
+
+    .bands-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.5;
+    }
+
+    .bands-hint strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .bands-card-hdr {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .bands-card-hdr .bands-hdr {
+      margin-bottom: 0;
+    }
+
+    .btn-bands-all {
+      font-size: 12px;
+      color: var(--purple);
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+
+    .btn-bands-all .ic-chev {
+      margin-left: 2px;
+    }
+
+    /* ── Screening probability ─────────────────────────── */
+    .screen-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .screen-note {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+      margin-bottom: 1.25rem;
+    }
+
+    .co-card {
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-md);
+      padding: .875rem;
+      cursor: pointer;
+      transition: border-color .15s, transform .15s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .co-card:hover {
+      border-color: var(--purple-mid);
+      transform: translateY(-2px);
+    }
+
+    .co-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .co-name {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .co-prog {
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    .co-val {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .co-bar-bg {
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 99px;
+    }
+
+    .co-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+
+    .co-sub {
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    .screen-nudge {
+      margin-top: 1rem;
+      padding: .75rem 1rem;
+      background: var(--surface2);
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .screen-nudge-txt {
+      font-size: 12px;
+      color: var(--text2);
+      flex: 1;
+    }
+
+    .screen-nudge-lnk {
+      font-size: 12px;
+      color: var(--purple);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    /* ── Challenge of the day ──────────────────────────── */
+    .cotd-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .cotd-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0;
+    }
+
+    .cotd-l {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .cotd-main {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .cotd-date {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .cotd-lnk {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      color: var(--purple);
+    }
+
+    .cotd-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cotd-cat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cotd-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ci-code {
+      background: var(--purple-lt);
+    }
+
+    .ci-apt {
+      background: var(--amber-lt);
+    }
+
+    .ci-vbl {
+      background: var(--teal-lt);
+    }
+
+    .cotd-cat-lbl {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text3);
+    }
+
+    .diff-pill {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+
+    .dp-easy {
+      background: var(--green-lt);
+      color: var(--green);
+    }
+
+    .dp-medium {
+      background: var(--amber-lt);
+      color: var(--amber);
+    }
+
+    .dp-hard {
+      background: var(--red-lt);
+      color: var(--red);
+    }
+
+    .cotd-q {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .cotd-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .cotd-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: var(--surface2);
+      color: var(--text2);
+    }
+
+    .cotd-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 0.5px solid var(--border);
+      margin-top: auto;
+    }
+
+    .cotd-att {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .cotd-att span {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .cotd-done {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--green);
+      background: var(--green-lt);
+      border-radius: 99px;
+      padding: 4px 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Question stats ────────────────────────────────── */
+    .qtabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .qtab {
+      padding: 5px 14px;
+      border-radius: 99px;
+      font-size: 12px;
+      border: 0.5px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      transition: all .15s;
+    }
+
+    .qtab:hover {
+      border-color: var(--border-h);
+      color: var(--text);
+    }
+
+    .qtab.active {
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      border-color: var(--purple-mid);
+      font-weight: 500;
+    }
+
+    .qgrid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .qcell {
+      background: var(--surface);
+      padding: 1rem 1.25rem;
+    }
+
+    .qcell-h {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .qcat {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .qtot {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .qcell-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qbig {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .qnum {
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    .qunit {
+      font-size: 13px;
+      color: var(--text3);
+    }
+
+    .qrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .qrow:last-child {
+      margin-bottom: 0;
+    }
+
+    .qlbl {
+      font-size: 11px;
+      width: 48px;
+      font-weight: 500;
+    }
+
+    .qcount {
+      font-size: 11px;
+      color: var(--text2);
+      width: 64px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ── Skills profile ────────────────────────────────── */
+    .skills-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .skill-col-hdr {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .skill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .skill-col-ttl {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .skill-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-radius: var(--r-md);
+      margin-bottom: 6px;
+    }
+
+    .skill-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .skill-n {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .skill-c {
+      font-size: 10px;
+    }
+
+    .sk-strong {
+      background: var(--green-lt);
+    }
+
+    .sk-strong .skill-n {
+      color: var(--green);
+    }
+
+    .sk-strong .skill-c {
+      color: var(--green-mid);
+    }
+
+    .sk-weak {
+      background: var(--red-lt);
+    }
+
+    .sk-weak .skill-n {
+      color: var(--red);
+    }
+
+    .sk-weak .skill-c {
+      color: #E24B4A;
+    }
+
+    .sk-caution {
+      background: var(--amber-lt);
+    }
+
+    .sk-caution .skill-n {
+      color: var(--amber);
+    }
+
+    .sk-caution .skill-c {
+      color: var(--amber-mid);
+    }
+
+    /* ── Verified languages ────────────────────────────── */
+    .lang-badge {
+      font-size: 11px;
+      color: var(--text3);
+      background: var(--surface2);
+      padding: 2px 9px;
+      border-radius: 99px;
+    }
+
+    .lang-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-md);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+
+    .lang-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .lang-item:hover {
+      border-color: var(--purple-mid);
+    }
+
+    .lang-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .lang-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .lang-cnt {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .lang-v {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--green);
+      font-weight: 500;
+      margin-left: auto;
+    }
+
+    .lang-u {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text3);
+      margin-left: auto;
+    }
+
+    .lang-chk {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--green-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .lang-x {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Courses ───────────────────────────────────────── */
+    .course-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+
+    .course-item:last-child {
+      border-bottom: none;
+    }
+
+    .course-item:hover {
+      opacity: .8;
+    }
+
+    .course-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--r-md);
+      background: var(--purple-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--purple);
+      flex-shrink: 0;
+    }
+
+    .course-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .cprog-bg {
+      height: 3px;
+      background: var(--surface2);
+      border-radius: 99px;
+      margin-top: 5px;
+    }
+
+    .cprog-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+
+    .status-pill {
+      font-size: 11px;
+      border-radius: 99px;
+      padding: 2px 9px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .sp-inprog {
+      background: var(--amber-lt);
+      color: var(--amber);
+    }
+
+    .sp-enrolled {
+      background: var(--green-lt);
+      color: var(--green);
+    }
+
+    /* ── Learning metrics ──────────────────────────────── */
+    .lm-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .lm-ranges {
+      display: flex;
+      gap: 4px;
+    }
+
+    .lm-range {
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      border: 0.5px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      transition: all .15s;
+    }
+
+    .lm-range:hover {
+      border-color: var(--border-h);
+      color: var(--text);
+    }
+
+    .lm-range.active {
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      border-color: var(--purple-mid);
+      font-weight: 500;
+    }
+
+    .lm-sec-lbl {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+    }
+
+    .lm-gauges {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-top: 1rem;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .lm-gauge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .lm-g-ttl {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 10px;
+    }
+
+    .lm-donut-legend {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .lm-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .lm-dot-lbl {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text3);
+    }
+
+    .lm-heatmap {
+      padding-top: 1rem;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .hmap-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      margin: 0 -2px;
+      padding: 0 2px 2px;
+    }
+
+    .hmap-inner {
+      min-width: 0;
+    }
+
+    .hmap-months {
+      display: grid;
+      grid-template-columns: repeat(52, minmax(0, 1fr));
+      gap: 2px;
+      padding-left: 32px;
+      margin-bottom: 6px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text3);
+      line-height: 1.2;
+      min-height: 14px;
+    }
+
+    .hmap-months span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hmap-main {
+      display: flex;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .hmap-day-labels {
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 26px;
+      width: 26px;
+      min-width: 26px;
+    }
+
+    .hmap-dl {
+      flex: 1 1 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 2px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text3);
+      line-height: 1;
+      min-height: 0;
+    }
+
+    .hmap-grid {
+      display: grid;
+      grid-template-columns: repeat(52, minmax(0, 1fr));
+      gap: 2px;
+      align-items: start;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hcell {
+      width: 100%;
+      aspect-ratio: 1;
+      min-width: 0;
+      border-radius: 2px;
+      background: var(--surface2);
+    }
+
+    .hcell.l1 {
+      background: #AFA9EC;
+    }
+
+    .hcell.l2 {
+      background: #7F77DD;
+    }
+
+    .hcell.l3 {
+      background: #534AB7;
+    }
+
+    .heat-leg {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .heat-sw {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .heat-lbl {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    /* ── Practice section (solves, breakdown, heatmap) ─── */
+    .practice-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.25rem;
+      scroll-margin-top: 72px;
+    }
+
+    .practice-section-hdr {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .practice-section-dek {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.45;
+      margin-top: 0.25rem;
+    }
+
+    .practice-glance-card {
+      padding: 1rem 1.25rem 1.1rem;
+    }
+
+    .practice-glance-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem 1.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .practice-glance-val {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .practice-glance-total {
+      font-size: 14px;
+      color: var(--text3);
+    }
+
+    .practice-glance-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem 1.75rem;
+    }
+
+    .practice-glance-metric-lbl {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text3);
+    }
+
+    .practice-glance-metric-val {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    .practice-glance-metric-sub {
+      font-size: 10px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .practice-glance-card .diff-dots {
+      margin-top: 0.35rem;
+    }
+
+    .practice-glance-breakdown {
+      margin-top: 12px;
+      display: inline-flex;
+    }
+
+    .practice-heatmap-card .lm-sec-lbl {
+      margin-bottom: 0;
+    }
+
+    .practice-heatmap-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 12px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .heatmap-years {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .heatmap-year {
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-family: inherit;
+      border: 0.5px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+
+    .heatmap-year:hover {
+      border-color: var(--border-h);
+      color: var(--text);
+    }
+
+    .heatmap-year.active {
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      border-color: var(--purple-mid);
+      font-weight: 500;
+    }
+
+    .practice-heatmap-note {
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    /* Questions solved gauge — full 360° ring, gaps, slot tracks + progress */
+    .practice-solve-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      min-height: 0;
+    }
+
+    .practice-solve-body {
+      display: grid;
+      grid-template-columns: 1fr minmax(0, 1fr);
+      gap: 1rem 1.35rem;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .practice-solve-body {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+
+      .practice-solve-side {
+        width: 100%;
+        max-width: 280px;
+      }
+    }
+
+    .solve-gauge-fig {
+      position: relative;
+      width: 100%;
+      max-width: 200px;
+      margin: 0 auto;
+      padding: 0;
+      aspect-ratio: 1;
+    }
+
+    .solve-gauge-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .solve-gauge-track {
+      stroke: var(--surface2);
+    }
+
+    .solve-gauge-seg--easy {
+      stroke: #7F77DD;
+    }
+
+    .solve-gauge-seg--med {
+      stroke: var(--amber-mid);
+    }
+
+    .solve-gauge-seg--hard {
+      stroke: #639922;
+    }
+
+    .solve-gauge-slot--easy {
+      stroke: #B8A9E8;
+    }
+
+    .solve-gauge-slot--med {
+      stroke: #E8B87A;
+    }
+
+    .solve-gauge-slot--hard {
+      stroke: #8FB86A;
+    }
+
+    .solve-gauge-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      line-height: 1.1;
+    }
+
+    .solve-gauge-num {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .solve-gauge-den {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text3);
+    }
+
+    .practice-solve-side {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      min-width: 0;
+      padding-top: 4px;
+    }
+
+    .practice-solve-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem 1.5rem;
+    }
+
+    .solve-gauge-arc-hint {
+      font-size: 10px;
+      color: var(--text3);
+      line-height: 1.35;
+      margin-bottom: 2px;
+    }
+
+    .solve-gauge-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text2);
+    }
+
+    .solve-gauge-legend span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .solve-gauge-legend .sg-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .practice-solve-breakdown {
+      margin-top: 6px;
+      display: inline-flex;
+      align-self: flex-start;
+    }
+
+    /* ── Report card (embedded) ────────────────────────── */
+    .rc-wrap {
+      padding: 0 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .rc-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .rc-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .rc-section .rc-ctrls {
+      margin-bottom: 1rem;
+    }
+
+    .rc-section .rc-tbl-wrap {
+      margin-top: 0;
+    }
+
+    .rc-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .rc-acts {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rc-view {
+      padding: 7px 14px;
+      font-size: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .rc-dl {
+      padding: 7px 16px;
+      font-size: 12px;
+      gap: 6px;
+    }
+
+    .rc-ctrls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .rc-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .rc-tab {
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 12px;
+      border: 0.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      transition: all .15s;
+    }
+
+    .rc-tab.active {
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      border-color: var(--purple-mid);
+      font-weight: 500;
+    }
+
+    .rc-ynav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rc-arrow {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 0.5px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color .15s;
+    }
+
+    .rc-arrow:hover {
+      border-color: var(--border-h);
+    }
+
+    .rc-yr-lbl {
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .rc-tbl-wrap {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+
+    .rc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .rc-table th {
+      padding: 10px 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text2);
+      text-align: center;
+      background: var(--surface2);
+      border-bottom: 0.5px solid var(--border);
+      white-space: nowrap;
+      min-width: 64px;
+    }
+
+    .rc-table th.cc {
+      text-align: left;
+      padding-left: 1.25rem;
+      min-width: 160px;
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .rc-table th.cm {
+      color: var(--purple);
+      border-bottom: 2px solid var(--purple);
+    }
+
+    .rc-table td {
+      padding: 9px 6px;
+      text-align: center;
+      border-bottom: 0.5px solid rgba(0, 0, 0, .05);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .rc-table td.cc {
+      padding-left: 1.25rem;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .rc-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .rc-table tr:hover td {
+      background: var(--surface2);
+    }
+
+    .rc-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 11px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .v-present {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .v-ab {
+      color: var(--amber-mid);
+      font-weight: 500;
+    }
+
+    .v-na {
+      color: var(--text3);
+    }
+
+    .v-dash {
+      color: var(--border-h);
+    }
+
+    .v-cur {
+      background: var(--purple-lt);
+    }
+
+    .rc-table td.rc-cell-band {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .rc-band-cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      min-height: 22px;
+      box-sizing: border-box;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .rc-band-cell.v-band-f,
+    .v-band-f {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--red-lt);
+      color: var(--red);
+      font-weight: 500;
+      border-radius: var(--r-sm);
+      padding: 2px 8px;
+    }
+
+    .rc-band-cell.v-band-d,
+    .v-band-d {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--amber-lt);
+      color: var(--amber);
+      font-weight: 500;
+      border-radius: var(--r-sm);
+      padding: 2px 8px;
+    }
+
+    .rc-band-cell.v-band-c,
+    .v-band-c {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--purple-lt);
+      color: var(--purple-dk);
+      font-weight: 500;
+      border-radius: var(--r-sm);
+      padding: 2px 8px;
+    }
+
+    .rc-band-cell.v-band-a,
+    .v-band-a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--green-lt);
+      color: var(--green);
+      font-weight: 500;
+      border-radius: var(--r-sm);
+      padding: 2px 8px;
+    }
+
+    .v-good {
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    .rc-legend {
+      padding: .75rem 1.25rem;
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .rc-leg {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .rc-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .month-sub {
+      font-size: 10px;
+      color: var(--text3);
+      font-weight: 400;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-name">TaPTaP</div>
+        <div class="logo-sub">by Blackbucks</div>
+      </div>
+      <div class="nav-sec">Main</div>
+      <a class="nav-item active" href="dashboard.html">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" />
+          <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".4" />
+          <rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".4" />
+          <rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".4" />
+        </svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" />
+          <path d="M6 8l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        Practice
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+          <path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+        Courses
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <path d="M3 12L6 7l3 3 2-4 2 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        MET Tests
+      </a>
+      <div class="nav-sec">Career</div>
+      <a class="nav-item" href="jobs.html">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+          <path d="M5 5V4a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        Jobs
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <circle cx="6" cy="6" r="3" stroke="currentColor" stroke-width="1.5" />
+          <path d="M11 14s0-3-5-3-5 3-5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M13 6l-2 2-1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+        </svg>
+        Smart Interview
+      </a>
+      <div class="nav-sec">Reports</div>
+      <a class="nav-item" href="report-card.html">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+          <rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+          <path d="M5 6h6M5 9h4M5 12h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+        Report Card
+      </a>
+    </nav>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-l">
+          <span class="pg-title">Dashboard</span>
+          <a href="#met-performance-card" class="score-pill score-pill--met-ok" id="score-pill-met">
+            <div class="score-dot" id="score-pill-dot"></div>
+            <span id="score-pill-label">Best MET: 71.2 · Band D</span>
+          </a>
+        </div>
+        <div class="tb-r">
+          <div class="avatar" title="Student Blackbucks">SB</div>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- Above the fold: orientation, profile + SI, activities (incl. MET) -->
+        <section class="dash-atf a1" aria-labelledby="dash-intro-heading">
+          <header class="dash-intro">
+            <h1 class="dash-intro__title" id="dash-intro-heading">Your placement prep, in one place</h1>
+            <p class="dash-intro__sub">Daily challenges, Smart Interview, profile updates, courses to finish, and resume export — all in one place.</p>
+          </header>
+
+          <div class="dash-actions-row">
+            <div class="dash-atf-stack">
+            <div class="card profile-banner" id="profile-card-dash">
+              <div class="profile-banner__top">
+                <div class="av-ring">
+                  <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="#E8E6E3" stroke-width="2.5" pathLength="100" />
+                    <circle cx="32" cy="32" r="26" fill="none" stroke="#534AB7" stroke-width="2.5" stroke-linecap="round"
+                      pathLength="100" stroke-dasharray="100" stroke-dashoffset="32" transform="rotate(-90 32 32)" />
+                  </svg>
+                  <div class="av-init">SB</div>
+                </div>
+                <div class="p-info">
+                  <div class="p-name-row">
+                    <span class="p-name">Student Blackbucks</span>
+                    <span class="p-verified" title="Verified profile">
+                      <svg class="p-verified-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" fill="var(--purple)" />
+                        <path d="M8 12l2.5 2.5 5-5" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <span class="visually-hidden">Verified profile</span>
+                    </span>
+                  </div>
+                  <div class="p-role-row">
+                    <span class="p-role">Software Developer</span>
+                    <span class="p-tag p-tag--explorer">Explorer</span>
+                  </div>
+                  <div class="p-social" aria-label="Profile links">
+                    <a href="https://www.linkedin.com/in/" class="p-social-link" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    </a>
+                    <a href="https://github.com/" class="p-social-link" target="_blank" rel="noopener noreferrer" title="GitHub">
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </a>
+                    <a href="https://leetcode.com/u/" class="p-social-link" target="_blank" rel="noopener noreferrer" title="LeetCode">
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.483 0L1.686 7.889v8.36L13.483 24l11.797-7.751v-8.36L13.483 0zm5.17 14.783l-1.85 1.15-4.3-2.65v4.65l-4.95 3.05V9.2l4.3-2.65 1.85 1.15-3.2 1.97 3.2 1.97zm-5.85-9.45l4.3 2.65v4.65l-4.3-2.65v-4.65zM3.686 9.2l4.3-2.65v4.65l-4.3 2.65V9.2zm1.85 11.55l4.3-2.65v4.65l-4.3 2.65v-4.65zm5.15-3.1l4.3-2.65v4.65l-4.3 2.65v-4.65z"/></svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="p-prog">
+                <div class="prog-bar"><div class="prog-fill" style="width:68%"></div></div>
+                <span class="prog-lbl">68% profile complete</span>
+              </div>
+              <button type="button" class="btn-dash-secondary btn-profile-cta">Update Profile</button>
+            </div>
+
+            <div class="dash-hero-primary">
+              <div class="si-panel" id="si-dashboard-card">
+                <div class="si-banner--claim si-banner--hero" id="si-state-claim">
+                  <div class="si-claim-head">
+                    <h2 class="si-claim-title">Smart Interview</h2>
+                    <span class="si-badge-free">FREE PLAN</span>
+                  </div>
+                  <div class="promo-card__body">
+                    <div class="promo-card__body-main">
+                      <p class="si-claim-desc">AI mock interview with instant feedback.</p>
+                      <p class="si-claim-meta">One free credit · Personalized questions · Feedback report</p>
+                    </div>
+                    <div class="promo-card__body-aside">
+                      <button type="button" class="si-btn-claim" id="si-claim-btn" onclick="claimSiCredit()">Claim free
+                        credit<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="si-banner--active si-banner--hero" id="si-state-active" hidden>
+                  <div class="si-active-head">
+                    <h2 class="si-active-title">Smart Interview</h2>
+                    <span class="si-badge-free--light">FREE PLAN</span>
+                  </div>
+                  <p class="si-active-sub">Valid for 1 Interview · No Renewal</p>
+                  <div class="si-active-body">
+                    <div class="si-credits-block">
+                      <div class="si-credits-big">0/1</div>
+                      <div class="si-credits-lbl">Credits</div>
+                    </div>
+                    <div class="si-rollover-box">
+                      <div class="si-rollover-l">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M12 4L4 8v8l8 4 8-4V8l-8-4z" stroke="currentColor" stroke-width="1.5"
+                            stroke-linejoin="round" />
+                          <path d="M4 8l8 4 8-4M12 12v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                        Rollover
+                      </div>
+                      <span class="si-rollover-r">Not applicable</span>
+                    </div>
+                  </div>
+                  <div class="si-active-footer">
+                    <button type="button" class="si-btn-primary si-cta">Start Interview</button>
+                    <button type="button" class="si-btn-outline" onclick="location.href='#'">View Plans</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+
+            <div class="card dash-activities" id="dash-activities-card">
+              <div class="dash-act-hdr">
+                <span class="dash-act-ttl">Still to do</span>
+                <p class="dash-act-lede">Only actions that are still pending — nothing completed shows up here.</p>
+              </div>
+              <div class="dash-act-met" role="region" aria-label="Pending MET actions" id="dash-act-met-root" hidden>
+                <!-- Pending: no MET yet — #met-none -->
+                <div id="met-act-panel-none" class="met-act-panel" hidden>
+                  <div class="met-act-title-row">
+                    <span class="dash-stat-lbl">MET</span>
+                    <span class="met-act-badge">Not started</span>
+                  </div>
+                  <p class="dash-act-met-hint">You haven’t taken a MET yet. Complete one to unlock your employability band and section scores.</p>
+                  <a href="#met-performance-card" class="dash-stat-link dash-act-met-lnk">Take your first MET<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+                </div>
+                <!-- Pending: MET due this month — #met-due -->
+                <div id="met-act-panel-due" class="met-act-panel" hidden>
+                  <div class="met-act-title-row">
+                    <span class="dash-stat-lbl">MET</span>
+                    <span class="met-act-badge met-act-badge--due">Due this month</span>
+                  </div>
+                  <p class="met-act-last">Last attempt: <strong>67.4</strong> · Band D · <span style="white-space:nowrap">Feb 2026</span></p>
+                  <p class="dash-act-met-hint">You haven’t taken <strong>this month’s</strong> MET. Schedule when you’re ready — it keeps your band current.</p>
+                  <a href="#met-performance-card" class="dash-stat-link dash-act-met-lnk">Take this month’s MET<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+                </div>
+              </div>
+              <a href="#practice-section" class="dash-act-item">
+                <span class="dash-act-ic" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V6l-8-4z" stroke="var(--purple)" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <div class="dash-act-main">
+                  <span class="dash-act-name">Challenge of the day</span>
+                  <span class="dash-act-sub">Coding · Longest Substring Without Repeating Characters</span>
+                </div>
+                <span class="dash-act-cta">Go<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+              </a>
+              
+              
+              <div class="dash-act-block">
+                <div class="dash-act-block-hd">
+                  <span class="dash-act-block-title">Courses to complete</span>
+                  <a href="#my-courses-section" class="dash-act-all">See all<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+                </div>
+                <div class="dash-act-course">
+                  <span class="dash-act-cn">DS</span>
+                  <div class="dash-act-cw">
+                    <span class="dash-act-ct">Data Structures &amp; Algorithms</span>
+                    <div class="cprog-bg"><div class="cprog-fill" style="width:35%;background:var(--purple-mid)"></div></div>
+                  </div>
+                  <span class="dash-act-pct">35%</span>
+                </div>
+                <div class="dash-act-course">
+                  <span class="dash-act-cn">PY</span>
+                  <div class="dash-act-cw">
+                    <span class="dash-act-ct">Python Foundations</span>
+                    <div class="cprog-bg"><div class="cprog-fill" style="width:10%;background:var(--green-mid)"></div></div>
+                  </div>
+                  <span class="dash-act-pct">10%</span>
+                </div>
+                <div class="dash-act-course">
+                  <span class="dash-act-cn">SY</span>
+                  <div class="dash-act-cw">
+                    <span class="dash-act-ct">System Design</span>
+                    <div class="cprog-bg"><div class="cprog-fill" style="width:0%;background:var(--green-mid)"></div></div>
+                  </div>
+                  <span class="dash-act-pct">0%</span>
+                </div>
+              </div>
+              <a href="#" class="dash-act-item dash-act-item--resume" id="resume-gen-card">
+                <span class="dash-act-ic" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="var(--purple)" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                <div class="dash-act-main">
+                  <span class="dash-act-name">Generate resume</span>
+                  <span class="dash-act-sub">One-line PDF from your profile</span>
+                </div>
+                <span class="dash-act-cta">Open<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Badges -->
+        <div class="card a2">
+          <div class="sec-hdr">
+            <div class="sec-ttl">My badges</div>
+            <a href="#" class="sec-lnk">View all<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          </div>
+          <div class="badges-row">
+            <!-- Earned: Hello World -->
+            <div class="badge-item">
+              <div class="badge-circle badge-earned">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" fill="#534AB7" />
+                  <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <div class="badge-check"><svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5 4-4" stroke="white" stroke-width="1.4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg></div>
+              </div>
+              <span class="badge-lbl">Hello World</span>
+            </div>
+            <!-- Earned: First MET -->
+            <div class="badge-item">
+              <div class="badge-circle badge-earned">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3l2.2 6.5H21l-5.6 4 2.1 6.5L12 16l-5.5 4 2.1-6.5L3 9.5h6.8z" fill="#534AB7" />
+                </svg>
+                <div class="badge-check"><svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5 4-4" stroke="white" stroke-width="1.4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg></div>
+              </div>
+              <span class="badge-lbl">First MET</span>
+            </div>
+            <!-- Earned: 10 Streak -->
+            <div class="badge-item">
+              <div class="badge-circle badge-earned">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H13L13 2z" fill="#534AB7" />
+                </svg>
+                <div class="badge-check"><svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5 4-4" stroke="white" stroke-width="1.4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg></div>
+              </div>
+              <span class="badge-lbl">10 Streak</span>
+            </div>
+            <!-- Locked: Solver ×100 — close, 89/100 done -->
+            <div class="badge-item" title="Solve 100 problems to unlock">
+              <div style="position:relative">
+                <div class="badge-circle badge-locked"><svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="8" stroke="var(--text3)" stroke-width="1.5" />
+                    <path d="M9 12l2 2 4-4" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg></div>
+                <div
+                  style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--amber-lt);color:var(--amber);font-size:9px;font-weight:500;border-radius:99px;padding:1px 6px;white-space:nowrap">
+                  89/100</div>
+              </div>
+              <span class="badge-lbl dim" style="margin-top:8px">Solver ×100</span>
+            </div>
+            <!-- Locked: Band C -->
+            <div class="badge-item" title="Reach Band C to unlock">
+              <div class="badge-circle badge-locked"><svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3v18M3 12l9-9 9 9" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg></div>
+              <span class="badge-lbl dim">Band C</span>
+            </div>
+            <!-- Locked: Interview Ready -->
+            <div class="badge-item" title="Complete Smart Interview to unlock">
+              <div class="badge-circle badge-locked"><svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="5" width="18" height="14" rx="2" stroke="var(--text3)" stroke-width="1.5" />
+                  <path d="M8 10h8M8 14h5" stroke="var(--text3)" stroke-width="1.3" stroke-linecap="round" />
+                </svg></div>
+              <span class="badge-lbl dim">Interview Ready</span>
+            </div>
+            <div class="badge-prog">
+              <div class="bp-title">3 of 6 earned</div>
+              <div class="bp-bar">
+                <div class="bp-fill" style="width:50%"></div>
+              </div>
+              <div class="bp-hint">Solve 11 more problems to unlock Solver ×100.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 1 -->
+        <div class="grid-3 a2">
+          <!-- MET -->
+          <div class="card card-btn" id="met-performance-card">
+            <div id="met-card-panel-none" class="met-card-panel" hidden>
+              <div class="met-hdr">
+                <span class="met-lbl">MET Performance</span>
+                <span class="met-badge met-badge--muted">No score yet</span>
+              </div>
+              <div class="met-empty-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3L4 8v8l8 4 8-4V8l-8-4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 8l8 4 8-4M12 12v8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <p class="met-empty-lead">Start with your first MET</p>
+              <p class="met-empty-desc">The MET measures aptitude, English, and coding. Your band and company insights appear after you finish.</p>
+              <a href="#" class="met-cta">Schedule or take MET<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            </div>
+            <div id="met-card-panel-due" class="met-card-panel" hidden>
+              <div class="met-hdr">
+                <span class="met-lbl">MET Performance</span>
+                <span class="met-badge met-badge--due">Due this month</span>
+              </div>
+              <p class="met-empty-lead">This month’s MET is pending</p>
+              <p class="met-due-summary">You last scored <strong>67.4</strong> (Band D) in <strong>February 2026</strong>. Take this month’s MET to refresh your band and stay eligible for shortlists.</p>
+              <a href="#" class="met-cta">Take this month’s MET<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            </div>
+            <div id="met-card-panel-ok" class="met-card-panel">
+              <div class="met-hdr">
+                <span class="met-lbl">MET Performance</span>
+                <span class="met-badge">Best + latest</span>
+              </div>
+              <p class="met-perf-note">Placement benchmarks use your <strong>best</strong> scores across every MET you’ve taken. When you’ve written an exam, you’ll also see your <strong>last attempt</strong> below so you can compare.</p>
+
+              <div class="met-block met-block--best">
+                <div class="met-block-hd">Best MET — all attempts</div>
+                <div class="met-score">71.2 <span class="met-score-s">/100</span></div>
+                <div class="met-band">Band D · 4–5 LPA (from best overall)</div>
+                <p class="met-mets-line"><strong>3</strong> METs completed · section highs below</p>
+                <div class="score-row"><span class="score-name">Aptitude <span class="score-flag">best</span></span>
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:62%;background:#7F77DD"></div>
+                  </div><span class="score-pct">62%</span>
+                </div>
+                <div class="score-row"><span class="score-name">English <span class="score-flag">best</span></span>
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:75%;background:#1D9E75"></div>
+                  </div><span class="score-pct">75%</span>
+                </div>
+                <div class="score-row"><span class="score-name">Coding <span class="score-flag">best</span></span>
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:85%;background:#639922"></div>
+                  </div><span class="score-pct">85%</span>
+                </div>
+              </div>
+
+              <div class="met-block met-block--latest">
+                <div class="met-block-hd">Latest attempt — Apr 2026</div>
+                <div class="met-score met-score--secondary">67.4 <span class="met-score-s">/100</span></div>
+                <div class="met-band">Band D · 4–5 LPA (this sitting only)</div>
+                <div class="score-row"><span class="score-name">Aptitude <span class="score-flag">latest</span></span>
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:58%;background:#7F77DD"></div>
+                  </div><span class="score-pct">58%</span>
+                </div>
+                <div class="score-row"><span class="score-name">English <span class="score-flag">latest</span></span>
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:71%;background:#1D9E75"></div>
+                  </div><span class="score-pct">71%</span>
+                </div>
+                <div class="score-row"><span class="score-name">Coding <span class="score-flag">latest</span></span>
+                  <div class="bar-bg">
+                    <div class="bar-fill" style="width:82%;background:#639922"></div>
+                  </div><span class="score-pct">82%</span>
+                </div>
+              </div>
+
+              <a href="#" class="met-cta">Prepare for next MET<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            </div>
+          </div>
+          <!-- Questions solved gauge (next to MET) + Jobs -->
+          <div class="stack">
+            <div class="card practice-solve-card" id="practice-solve-card">
+              <div class="card-lbl">Questions solved</div>
+              <div class="practice-solve-body">
+                <div class="solve-gauge-fig">
+                  <!-- Full circle (100%). W=(100−2g)/3, g=2. Slot tracks + progress. -->
+                  <svg class="solve-gauge-svg" viewBox="0 0 200 200" role="img"
+                    aria-label="Easy 187 of 4018, Medium 98 of 3643, Hard 27 of 2500">
+                    <g transform="translate(100,100) rotate(-135)">
+                      <circle class="solve-gauge-track" cx="0" cy="0" r="68" fill="none" stroke-width="13"
+                        pathLength="100" stroke-linecap="round" />
+                      <circle class="solve-gauge-slot solve-gauge-slot--easy" cx="0" cy="0" r="68" fill="none" stroke-width="13"
+                        pathLength="100" stroke-linecap="round" stroke-dasharray="32 68" />
+                      <circle class="solve-gauge-slot solve-gauge-slot--med" cx="0" cy="0" r="68" fill="none" stroke-width="13"
+                        pathLength="100" stroke-linecap="round" stroke-dasharray="32 68" stroke-dashoffset="-34" />
+                      <circle class="solve-gauge-slot solve-gauge-slot--hard" cx="0" cy="0" r="68" fill="none" stroke-width="13"
+                        pathLength="100" stroke-linecap="round" stroke-dasharray="32 68" stroke-dashoffset="-68" />
+                      <circle class="solve-gauge-seg solve-gauge-seg--easy" cx="0" cy="0" r="68" fill="none" stroke-width="13"
+                        pathLength="100" stroke-linecap="round" stroke-dasharray="32 68">
+                        <animate attributeName="stroke-dasharray" dur="3s" fill="freeze" calcMode="spline"
+                          keyTimes="0;1" keySplines="0.22 1 0.36 1"
+                          values="32 68;1.4893 98.5107" />
+                      </circle>
+                      <circle class="solve-gauge-seg solve-gauge-seg--med" cx="0" cy="0" r="68" fill="none" stroke-width="13"
+                        pathLength="100" stroke-linecap="round" stroke-dashoffset="-34" stroke-dasharray="32 68">
+                        <animate attributeName="stroke-dasharray" dur="3s" fill="freeze" calcMode="spline"
+                          keyTimes="0;1" keySplines="0.22 1 0.36 1"
+                          values="32 68;0.8608 99.1392" />
+                      </circle>
+                      <circle class="solve-gauge-seg solve-gauge-seg--hard" cx="0" cy="0" r="68" fill="none" stroke-width="13"
+                        pathLength="100" stroke-linecap="round" stroke-dashoffset="-68" stroke-dasharray="32 68">
+                        <animate attributeName="stroke-dasharray" dur="3s" fill="freeze" calcMode="spline"
+                          keyTimes="0;1" keySplines="0.22 1 0.36 1"
+                          values="32 68;0.3456 99.6544" />
+                      </circle>
+                    </g>
+                  </svg>
+                  <div class="solve-gauge-center">
+                    <span class="solve-gauge-num" id="solve-gauge-num">0</span><span class="solve-gauge-den">/10161</span>
+                  </div>
+                </div>
+                <div class="practice-solve-side">
+                  <div class="practice-solve-metrics">
+                    <div>
+                      <div class="practice-glance-metric-lbl">Accuracy</div>
+                      <div class="practice-glance-metric-val">78%</div>
+                    </div>
+                    <div>
+                      <div class="practice-glance-metric-lbl">College rank</div>
+                      <div class="practice-glance-metric-val">#14</div>
+                      <div class="practice-glance-metric-sub">in practice</div>
+                    </div>
+                  </div>
+                  <div class="solve-gauge-legend">
+                    <span class="solve-gauge-arc-hint">Pastel bands = full pool per level; bright stroke = your completion.</span>
+                    <span><span class="sg-dot" style="background:#7F77DD"></span>Easy 187/4018</span>
+                    <span><span class="sg-dot" style="background:var(--amber-mid)"></span>Med 98/3643</span>
+                    <span><span class="sg-dot" style="background:#639922"></span>Hard 27/2500</span>
+                  </div>
+                </div>
+              </div>
+              <a href="#qstats" class="sec-lnk practice-solve-breakdown">View full breakdown<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            </div>
+            <div class="card card-btn jobs-row" onclick="window.location='jobs.html'">
+              <div style="flex:1">
+                <div class="card-lbl">Jobs Applied</div>
+                <div class="card-val">3</div>
+                <div class="card-lbl">Shortlisted</div>
+                <div class="card-val">5</div>
+                <div class="short-pill"><svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                  </svg>Shortlisted: 1</div>
+              </div>
+              <div class="jobs-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="2" y="6" width="16" height="12" rx="2" stroke="#0F6E56" stroke-width="1.5" />
+                  <path d="M6 6V5a4 4 0 018 0v1" stroke="#0F6E56" stroke-width="1.5" />
+                </svg></div>
+            </div>
+          </div>
+          <!-- Rank + Bands -->
+          <div class="stack">
+            <div class="card card-btn rank-row">
+              <div class="rank-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 3l1.8 5.5H17l-4.6 3.3 1.7 5.4L10 14l-4.1 3.2 1.7-5.4L3 8.5h5.2z" fill="#534AB7" />
+                </svg></div>
+              <div>
+                <div class="title">MET RANK</div>
+                <div class="rank-val">216</div>
+                <div class="rank-lbl">State rank</div>
+              </div>
+              <div class="rank-side">#1 College</div>
+            </div>
+            <div class="card card-btn">
+              <div class="bands-card-hdr">
+                <div class="bands-hdr">MET Bands</div>
+                <button onclick="openBandsPopup()" type="button" class="btn-bands-all">View all<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+              </div>
+              <div class="band-row"><span class="band-name">Band F</span><span class="band-chip band-f">3 LPA</span>
+              </div>
+              <div class="band-row"><span class="band-name">Band E</span><span class="band-chip band-f">3–4 LPA</span>
+              </div>
+              <div class="band-row"
+                style="background:var(--purple-lt);margin:0 -1.5rem;padding:7px 1.5rem;border-radius:var(--r-sm)">
+                <span class="band-name" style="font-weight:500;color:var(--purple-dk)">Current — Band D</span>
+                <span class="band-chip band-b">4–5 LPA</span>
+              </div>
+              <div class="band-row"><span class="band-name">Band C <span style="font-size:10px;color:var(--amber)">next
+                    target</span></span><span class="band-chip band-c">5–7 LPA</span></div>
+              <div class="bands-hint">Score above <strong>75</strong> on your next MET to reach Band C and unlock IBM
+                &amp; Wipro Elite.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screening probability -->
+        <div class="card a3">
+          <div class="sec-hdr">
+            <div>
+              <div class="screen-title">Probability of clearing company screening</div>
+              <div class="screen-note">* Subject to company eligibility criteria based on your academic percentages and
+                current job vacancies</div>
+            </div>
+            <a href="jobs.html" class="sec-lnk" style="white-space:nowrap;flex-shrink:0">View all<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          </div>
+          <div class="grid-6">
+
+            <!-- Cognizant — High -->
+            <div class="co-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="co-logo" style="background:var(--blue-lt);color:var(--blue-dk)">CG</div>
+                <span
+                  style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--green-lt);color:var(--green);font-weight:500">High</span>
+              </div>
+              <div>
+                <div class="co-name">Cognizant</div>
+                <div class="co-prog">GenC</div>
+              </div>
+              <div class="co-val" style="color:var(--green);font-size:20px">72%</div>
+              <div class="co-bar-bg">
+                <div class="co-bar-fill" style="width:72%;background:var(--green-mid)"></div>
+              </div>
+              <div class="co-sub">Eligible · 3 openings</div>
+            </div>
+
+            <!-- TCS — Moderate -->
+            <div class="co-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="co-logo" style="background:var(--amber-lt);color:#633806">TC</div>
+                <span
+                  style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--amber-lt);color:var(--amber);font-weight:500">Moderate</span>
+              </div>
+              <div>
+                <div class="co-name">TCS</div>
+                <div class="co-prog">NQT</div>
+              </div>
+              <div class="co-val" style="color:var(--amber);font-size:20px">48%</div>
+              <div class="co-bar-bg">
+                <div class="co-bar-fill" style="width:48%;background:var(--amber-mid)"></div>
+              </div>
+              <div class="co-sub">Eligible · 5 openings</div>
+            </div>
+
+            <!-- Wipro — Moderate -->
+            <div class="co-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="co-logo" style="background:var(--purple-lt);color:var(--purple-dk)">WI</div>
+                <span
+                  style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--amber-lt);color:var(--amber);font-weight:500">Moderate</span>
+              </div>
+              <div>
+                <div class="co-name">Wipro</div>
+                <div class="co-prog">Elite / Turbo</div>
+              </div>
+              <div class="co-val" style="color:var(--amber);font-size:20px">41%</div>
+              <div class="co-bar-bg">
+                <div class="co-bar-fill" style="width:41%;background:var(--purple-mid)"></div>
+              </div>
+              <div class="co-sub">Eligible · 2 openings</div>
+            </div>
+
+            <!-- HCL — Low -->
+            <div class="co-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="co-logo" style="background:var(--teal-lt);color:#085041">HC</div>
+                <span
+                  style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--red-lt);color:var(--red);font-weight:500">Low</span>
+              </div>
+              <div>
+                <div class="co-name">HCL</div>
+                <div class="co-prog">Tech Bee</div>
+              </div>
+              <div class="co-val" style="color:var(--red);font-size:20px">22%</div>
+              <div class="co-bar-bg">
+                <div class="co-bar-fill" style="width:22%;background:#E24B4A"></div>
+              </div>
+              <div class="co-sub">CGPA below cutoff</div>
+            </div>
+
+            <!-- Tech Mahindra — Not eligible -->
+            <div class="co-card" style="opacity:.65">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="co-logo" style="background:var(--green-lt);color:#27500A">TM</div>
+                <span
+                  style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--surface2);color:var(--text3);font-weight:500">Ineligible</span>
+              </div>
+              <div>
+                <div class="co-name">Tech Mahindra</div>
+                <div class="co-prog">Smart Hire</div>
+              </div>
+              <div class="co-val" style="color:var(--text3);font-size:20px">—</div>
+              <div class="co-bar-bg">
+                <div class="co-bar-fill" style="width:0%;background:var(--green-mid)"></div>
+              </div>
+              <div class="co-sub">Backlogs detected</div>
+            </div>
+
+            <!-- IBM — Low -->
+            <div class="co-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="co-logo" style="background:var(--blue-lt);color:var(--blue-dk)">IB</div>
+                <span
+                  style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--red-lt);color:var(--red);font-weight:500">Low</span>
+              </div>
+              <div>
+                <div class="co-name">IBM</div>
+                <div class="co-prog">Off Campus</div>
+              </div>
+              <div class="co-val" style="color:var(--red);font-size:20px">18%</div>
+              <div class="co-bar-bg">
+                <div class="co-bar-fill" style="width:18%;background:#185FA5"></div>
+              </div>
+              <div class="co-sub">Band too low</div>
+            </div>
+
+          </div>
+
+          <!-- How it's calculated -->
+          <div class="card--inset screen-explain" style="margin-top:1rem;">
+            <div style="font-size:12px;font-weight:500;margin-bottom:.5rem;">How probability is calculated</div>
+            <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--purple-mid)"></div>MET score &amp;
+                band
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--amber-mid)"></div>Academic CGPA / %
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
+                <div style="width:8px;height:8px;border-radius:50%;background:var(--green-mid)"></div>Active job
+                vacancies
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
+                <div style="width:8px;height:8px;border-radius:50%;background:#E24B4A"></div>Backlog status
+              </div>
+              <a href="#" style="font-size:11px;color:var(--purple);margin-left:auto;font-weight:500;display:inline-flex;align-items:center">Improve my score<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            </div>
+          </div>
+        </div>
+
+        <section class="practice-section" id="practice-section" aria-labelledby="practice-heading">
+          <div>
+            <h2 id="practice-heading" class="practice-section-hdr">Practice</h2>
+            <p class="practice-section-dek">Your solves, accuracy, and submission activity — in one place.</p>
+          </div>
+
+        <!-- Challenge of the day -->
+        <div class="card cotd-section a3" id="cotd-section">
+          <div class="cotd-hdr">
+            <div class="cotd-l"><span class="cotd-main">Challenge of the day</span><span class="cotd-date">17 Mar
+                2026</span></div>
+            <a href="#" class="cotd-lnk">View all challenges<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          </div>
+          <div class="grid-3">
+            <div class="card card-btn" style="display:flex;flex-direction:column;gap:10px" id="cotd-coding">
+              <div class="cotd-top">
+                <div class="cotd-cat">
+                  <div class="cotd-icon ci-code"><svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M5 4L2 8l3 4M11 4l3 4-3 4M9 3l-2 10" stroke="#534AB7" stroke-width="1.4"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></div><span class="cotd-cat-lbl">Coding</span>
+                </div><span class="diff-pill dp-medium">Medium</span>
+              </div>
+              <div class="cotd-q">Longest Substring Without Repeating Characters</div>
+              <div class="cotd-tags"><span class="cotd-tag">Sliding Window</span><span class="cotd-tag">Strings</span>
+              </div>
+              <div class="cotd-foot"><span class="cotd-att">Attempts: <span id="coding-attempts">0</span></span><button
+                  class="cotd-solve" id="cotd-coding-btn" onclick="markSolved('coding')">Solve<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></div>
+            </div>
+            <div class="card card-btn" style="display:flex;flex-direction:column;gap:10px" id="cotd-aptitude">
+              <div class="cotd-top">
+                <div class="cotd-cat">
+                  <div class="cotd-icon ci-apt"><svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <rect x="2" y="2" width="5" height="5" rx="1" stroke="#854F0B" stroke-width="1.3" />
+                      <rect x="9" y="2" width="5" height="5" rx="1" stroke="#854F0B" stroke-width="1.3" />
+                      <rect x="2" y="9" width="5" height="5" rx="1" stroke="#854F0B" stroke-width="1.3" />
+                      <path d="M9 11.5h5M11.5 9v5" stroke="#854F0B" stroke-width="1.3" stroke-linecap="round" />
+                    </svg></div><span class="cotd-cat-lbl">Aptitude</span>
+                </div><span class="diff-pill dp-easy">Easy</span>
+              </div>
+              <div class="cotd-q">A train covers 360 km in 4 hours. What is its speed in m/s?</div>
+              <div class="cotd-tags"><span class="cotd-tag">Speed & Distance</span><span class="cotd-tag">Units</span>
+              </div>
+              <div class="cotd-foot"><span class="cotd-att">Attempts: <span
+                    id="aptitude-attempts">0</span></span><button class="cotd-solve" id="cotd-aptitude-btn"
+                  onclick="markSolved('aptitude')">Solve<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></div>
+            </div>
+            <div class="card card-btn" style="display:flex;flex-direction:column;gap:10px" id="cotd-verbal">
+              <div class="cotd-top">
+                <div class="cotd-cat">
+                  <div class="cotd-icon ci-vbl"><svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 4h10M3 8h7M3 12h5" stroke="#0F6E56" stroke-width="1.4" stroke-linecap="round" />
+                    </svg></div><span class="cotd-cat-lbl">Verbal</span>
+                </div><span class="diff-pill dp-hard">Hard</span>
+              </div>
+              <div class="cotd-q">Identify the error: "Neither the manager nor the employees was present."</div>
+              <div class="cotd-tags"><span class="cotd-tag">Grammar</span><span class="cotd-tag">Subject-Verb</span>
+              </div>
+              <div class="cotd-foot"><span class="cotd-att">Attempts: <span id="verbal-attempts">0</span></span><button
+                  class="cotd-solve" id="cotd-verbal-btn" onclick="markSolved('verbal')">Solve<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question stats -->
+        <div class="card a3" id="qstats">
+          <div class="sec-hdr">
+            <div class="sec-ttl">Questions solved</div>
+            <div class="qtabs">
+              <button class="qtab active" onclick="switchQTab(this,'all')">All time</button>
+              <button class="qtab" onclick="switchQTab(this,'week')">This week</button>
+              <button class="qtab" onclick="switchQTab(this,'today')">Today</button>
+            </div>
+          </div>
+          <div class="qgrid">
+            <div class="qcell">
+              <div class="qcell-h">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="qcell-icon" style="background:var(--purple-lt)"><svg width="13" height="13"
+                      viewBox="0 0 16 16" fill="none">
+                      <path d="M5 4L2 8l3 4M11 4l3 4-3 4M9 3l-2 10" stroke="#534AB7" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                    </svg></div><span class="qcat">Coding</span>
+                </div><span class="qtot">312 / 5161</span>
+              </div>
+              <div class="qbig"><span class="qnum" id="coding-solved">0</span><span class="qunit">solved</span></div>
+              <div class="qrow"><span class="qlbl" style="color:var(--green)">Easy</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="coding-easy-bar" style="width:0%;background:var(--green-mid)"></div>
+                </div><span class="qcount" id="coding-easy-count">0 / 1800</span>
+              </div>
+              <div class="qrow"><span class="qlbl" style="color:var(--amber)">Medium</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="coding-med-bar" style="width:0%;background:var(--amber-mid)"></div>
+                </div><span class="qcount" id="coding-med-count">0 / 2161</span>
+              </div>
+              <div class="qrow"><span class="qlbl" style="color:var(--red)">Hard</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="coding-hard-bar" style="width:0%;background:#E24B4A"></div>
+                </div><span class="qcount" id="coding-hard-count">0 / 1200</span>
+              </div>
+            </div>
+            <div class="qcell">
+              <div class="qcell-h">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="qcell-icon" style="background:var(--amber-lt)"><svg width="13" height="13"
+                      viewBox="0 0 16 16" fill="none">
+                      <rect x="2" y="2" width="5" height="5" rx="1" stroke="#854F0B" stroke-width="1.4" />
+                      <rect x="9" y="2" width="5" height="5" rx="1" stroke="#854F0B" stroke-width="1.4" />
+                      <rect x="2" y="9" width="5" height="5" rx="1" stroke="#854F0B" stroke-width="1.4" />
+                      <path d="M9 11.5h5M11.5 9v5" stroke="#854F0B" stroke-width="1.4" stroke-linecap="round" />
+                    </svg></div><span class="qcat">Aptitude</span>
+                </div><span class="qtot">216 / 3000</span>
+              </div>
+              <div class="qbig"><span class="qnum" id="aptitude-solved">0</span><span class="qunit">solved</span></div>
+              <div class="qrow"><span class="qlbl" style="color:var(--green)">Easy</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="apt-easy-bar" style="width:0%;background:var(--green-mid)"></div>
+                </div><span class="qcount" id="apt-easy-count">0 / 1200</span>
+              </div>
+              <div class="qrow"><span class="qlbl" style="color:var(--amber)">Medium</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="apt-med-bar" style="width:0%;background:var(--amber-mid)"></div>
+                </div><span class="qcount" id="apt-med-count">0 / 1100</span>
+              </div>
+              <div class="qrow"><span class="qlbl" style="color:var(--red)">Hard</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="apt-hard-bar" style="width:0%;background:#E24B4A"></div>
+                </div><span class="qcount" id="apt-hard-count">0 / 700</span>
+              </div>
+            </div>
+            <div class="qcell">
+              <div class="qcell-h">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="qcell-icon" style="background:var(--teal-lt)"><svg width="13" height="13"
+                      viewBox="0 0 16 16" fill="none">
+                      <path d="M3 4h10M3 8h7M3 12h5" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" />
+                    </svg></div><span class="qcat">Verbal</span>
+                </div><span class="qtot">131 / 2000</span>
+              </div>
+              <div class="qbig"><span class="qnum" id="verbal-solved">0</span><span class="qunit">solved</span></div>
+              <div class="qrow"><span class="qlbl" style="color:var(--green)">Easy</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="verbal-easy-bar" style="width:0%;background:var(--green-mid)"></div>
+                </div><span class="qcount" id="verbal-easy-count">0 / 800</span>
+              </div>
+              <div class="qrow"><span class="qlbl" style="color:var(--amber)">Medium</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="verbal-med-bar" style="width:0%;background:var(--amber-mid)"></div>
+                </div><span class="qcount" id="verbal-med-count">0 / 800</span>
+              </div>
+              <div class="qrow"><span class="qlbl" style="color:var(--red)">Hard</span>
+                <div class="bar-bg">
+                  <div class="bar-fill" id="verbal-hard-bar" style="width:0%;background:#E24B4A"></div>
+                </div><span class="qcount" id="verbal-hard-count">0 / 400</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <div class="card practice-heatmap-card a3">
+            <div class="practice-heatmap-hdr">
+              <div class="lm-sec-lbl">Submission activity</div>
+              <div class="heatmap-years" role="group" aria-label="Filter by year">
+                <button type="button" class="heatmap-year" data-year="2024">2024</button>
+                <button type="button" class="heatmap-year" data-year="2025">2025</button>
+                <button type="button" class="heatmap-year active" data-year="2026">2026</button>
+              </div>
+            </div>
+            <p class="practice-heatmap-note">Questions submitted per week over the last year. Time spent learning stays in Learning metrics.</p>
+            <div class="hmap-scroll">
+              <div class="hmap-inner">
+                <div class="hmap-months" id="heatmap-months" aria-hidden="true"></div>
+                <div class="hmap-main">
+                  <div class="hmap-day-labels" aria-hidden="true">
+                    <span class="hmap-dl">Mon</span>
+                    <span class="hmap-dl"></span>
+                    <span class="hmap-dl">Wed</span>
+                    <span class="hmap-dl"></span>
+                    <span class="hmap-dl">Fri</span>
+                    <span class="hmap-dl"></span>
+                    <span class="hmap-dl"></span>
+                  </div>
+                  <div class="hmap-grid practice-hmap-grid" id="heatmap" role="group"
+                    aria-label="Submission activity by week, Monday through Sunday"></div>
+                </div>
+              </div>
+            </div>
+            <div class="heat-leg">
+              <span class="heat-lbl">Less</span>
+              <div class="heat-sw" style="background:var(--surface2)"></div>
+              <div class="heat-sw" style="background:#AFA9EC"></div>
+              <div class="heat-sw" style="background:#7F77DD"></div>
+              <div class="heat-sw" style="background:#534AB7"></div>
+              <span class="heat-lbl">More</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Skills + Languages -->
+        <div class="grid-2 a4">
+          <div class="card">
+            <div class="sec-hdr">
+              <div class="sec-ttl">Overall skill profile</div><a href="#practice-section" class="sec-lnk">Practice now<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            </div>
+            <div class="skills-cols">
+              <div>
+                <div class="skill-col-hdr">
+                  <div class="skill-dot" style="background:var(--green-mid)"></div><span class="skill-col-ttl"
+                    style="color:var(--green)">Strong areas</span>
+                </div>
+                <div class="skill-item sk-strong"><span class="skill-n">Backtracking</span><span
+                    class="skill-c">DSA</span></div>
+                <div class="skill-item sk-strong"><span class="skill-n">Dynamic Programming</span><span
+                    class="skill-c">DSA</span></div>
+                <div class="skill-item sk-strong"><span class="skill-n">Linked Lists</span><span
+                    class="skill-c">DSA</span></div>
+              </div>
+              <div>
+                <div class="skill-col-hdr">
+                  <div class="skill-dot" style="background:#E24B4A"></div><span class="skill-col-ttl"
+                    style="color:var(--red)">Focus areas</span>
+                </div>
+                <div class="skill-item sk-weak"><span class="skill-n">Arrays</span><span class="skill-c">DSA</span>
+                </div>
+                <div class="skill-item sk-caution"><span class="skill-n">Trees</span><span class="skill-c">DSA</span>
+                </div>
+                <div class="skill-item sk-caution"><span class="skill-n">Graphs</span><span class="skill-c">DSA</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sec-hdr">
+              <div class="sec-ttl">Verified coding languages</div><span class="lang-badge">Platform verified</span>
+            </div>
+            <div class="lang-item">
+              <div class="lang-icon" style="background:var(--blue-lt);color:var(--blue-dk)">C</div>
+              <div>
+                <div class="lang-name">C</div>
+                <div class="lang-cnt">47 problems solved</div>
+              </div>
+              <div class="lang-v">
+                <div class="lang-chk"><svg width="9" height="9" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5 4-4" stroke="#3B6D11" stroke-width="1.4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg></div>Verified
+              </div>
+            </div>
+            <div class="lang-item">
+              <div class="lang-icon" style="background:var(--amber-lt);color:#633806">C++</div>
+              <div>
+                <div class="lang-name">C++</div>
+                <div class="lang-cnt">12 problems solved</div>
+              </div>
+              <div class="lang-u">
+                <div class="lang-x"><svg width="9" height="9" viewBox="0 0 10 10" fill="none">
+                    <path d="M3 3l4 4M7 3l-4 4" stroke="var(--text3)" stroke-width="1.3" stroke-linecap="round" />
+                  </svg></div>Not verified
+              </div>
+            </div>
+            <div class="lang-item">
+              <div class="lang-icon" style="background:var(--teal-lt);color:#085041">PY</div>
+              <div>
+                <div class="lang-name">Python</div>
+                <div class="lang-cnt">198 problems solved</div>
+              </div>
+              <div class="lang-v">
+                <div class="lang-chk"><svg width="9" height="9" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5 4-4" stroke="#3B6D11" stroke-width="1.4" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg></div>Verified
+              </div>
+            </div>
+            <div class="lang-item">
+              <div class="lang-icon" style="background:var(--red-lt);color:#791F1F">Java</div>
+              <div>
+                <div class="lang-name">Java</div>
+                <div class="lang-cnt">8 problems solved</div>
+              </div>
+              <div class="lang-u">
+                <div class="lang-x"><svg width="9" height="9" viewBox="0 0 10 10" fill="none">
+                    <path d="M3 3l4 4M7 3l-4 4" stroke="var(--text3)" stroke-width="1.3" stroke-linecap="round" />
+                  </svg></div>Not verified
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Courses + Learning metrics -->
+        <div class="grid-2 a4">
+          <div class="card" id="my-courses-section">
+            <div class="sec-hdr">
+              <div class="sec-ttl">My courses</div><a href="#" class="sec-lnk">See all<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+            </div>
+            <div class="course-item">
+              <div class="course-icon">DS</div>
+              <div style="flex:1">
+                <div class="course-name">Data Structures & Algorithms</div>
+                <div class="cprog-bg">
+                  <div class="cprog-fill" style="width:35%;background:var(--purple-mid)"></div>
+                </div>
+              </div><span class="status-pill sp-inprog">In progress</span>
+            </div>
+            <div class="course-item">
+              <div class="course-icon">PY</div>
+              <div style="flex:1">
+                <div class="course-name">Python Foundations</div>
+                <div class="cprog-bg">
+                  <div class="cprog-fill" style="width:10%;background:var(--green-mid)"></div>
+                </div>
+              </div><span class="status-pill sp-enrolled">Enrolled</span>
+            </div>
+            <div class="course-item">
+              <div class="course-icon">SY</div>
+              <div style="flex:1">
+                <div class="course-name">System Design</div>
+                <div class="cprog-bg">
+                  <div class="cprog-fill" style="width:0%;background:var(--green-mid)"></div>
+                </div>
+              </div><span class="status-pill sp-enrolled">Enrolled</span>
+            </div>
+          </div>
+          <div class="card lm-card">
+            <div class="sec-hdr">
+              <div class="sec-ttl">Learning metrics</div>
+              <div class="lm-ranges">
+                <button class="lm-range active" onclick="setRange(this,'7d')">7d</button>
+                <button class="lm-range" onclick="setRange(this,'30d')">30d</button>
+                <button class="lm-range" onclick="setRange(this,'all')">All</button>
+              </div>
+            </div>
+            <div>
+              <div class="lm-sec-lbl">Hours spent</div>
+              <div style="position:relative;height:110px"><canvas id="hoursChart"></canvas></div>
+            </div>
+            <div class="lm-gauges">
+              <div class="lm-gauge">
+                <div class="lm-g-ttl">Attention span</div>
+                <div style="position:relative;width:88px;height:50px;overflow:hidden">
+                  <svg width="88" height="88" viewBox="0 0 88 88" style="position:absolute;top:0;left:0">
+                    <path d="M 10 54 A 34 34 0 1 1 78 54" fill="none" stroke="#f2f1ef" stroke-width="7"
+                      stroke-linecap="round" />
+                    <path id="attn-arc" d="M 10 54 A 34 34 0 1 1 78 54" fill="none" stroke="#534AB7" stroke-width="7"
+                      stroke-linecap="round" stroke-dasharray="107" stroke-dashoffset="107" />
+                  </svg>
+                  <div
+                    style="position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:16px;font-weight:500"
+                    id="attn-pct">—</div>
+                </div>
+                <div style="font-size:11px;color:var(--text3);margin-top:6px" id="attn-label">No data yet</div>
+              </div>
+              <div class="lm-gauge">
+                <div class="lm-g-ttl">Courses</div>
+                <div style="position:relative;width:60px;height:60px">
+                  <canvas id="courseDonut" width="60" height="60"></canvas>
+                  <div
+                    style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500">
+                    3</div>
+                </div>
+                <div class="lm-donut-legend">
+                  <div class="lm-dot-lbl">
+                    <div class="lm-dot" style="background:var(--green-mid)"></div>Enrolled
+                  </div>
+                  <div class="lm-dot-lbl">
+                    <div class="lm-dot" style="background:var(--amber-mid)"></div>Active
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+
+      <!-- Report Card -->
+      <div class="rc-wrap">
+        <div class="card rc-section">
+          <div class="rc-hdr">
+            <div class="rc-title">Report Card</div>
+            <div class="rc-acts">
+              <a href="report-card.html" class="rc-view">View full report<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+              <button class="rc-dl" onclick="window.print()">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="white" stroke-width="1.3"
+                    stroke-linecap="round" />
+                  <path d="M7 1v7M4.5 6L7 9l2.5-3" stroke="white" stroke-width="1.3" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+                Download
+              </button>
+            </div>
+          </div>
+          <div class="rc-ctrls">
+            <div class="rc-tabs">
+              <button class="rc-tab active" id="rc-tab-met" onclick="rcTab('met')">MET yearly report</button>
+              <button class="rc-tab" id="rc-tab-coding" onclick="rcTab('coding')">MET coding yearly</button>
+            </div>
+            <div class="rc-ynav">
+              <button class="rc-arrow" onclick="rcYear(-1)"><svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M7.5 2L4 6l3.5 4" stroke="var(--text2)" stroke-width="1.3" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg></button>
+              <span class="rc-yr-lbl" id="rc-yr">2026</span>
+              <button class="rc-arrow" onclick="rcYear(1)"><svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M4.5 2L8 6l-3.5 4" stroke="var(--text2)" stroke-width="1.3" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg></button>
+            </div>
+          </div>
+          <div class="rc-tbl-wrap">
+            <div style="overflow-x:auto">
+              <table class="rc-table">
+                <thead>
+                  <tr id="rc-head"></tr>
+                </thead>
+                <tbody id="rc-body"></tbody>
+              </table>
+            </div>
+            <div class="rc-legend">
+              <div class="rc-leg">
+                <div class="rc-dot" style="background:var(--amber-mid)"></div>AB — Absent
+              </div>
+              <div class="rc-leg">
+                <div class="rc-dot" style="background:var(--text3)"></div>NA — Not applicable
+              </div>
+              <div class="rc-leg">
+                <div class="rc-dot" style="background:var(--purple-mid)"></div>Highlighted — current month
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Band ladder (forward view — monthly scores stay in the report card above) -->
+        <div class="card band-progress-card">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1rem;">
+            <div>
+              <div class="rc-title">Path to the next band</div>
+              <p class="band-prog-dek">Your month-by-month MET scores and band row are in the <strong>Report card</strong> above. This block only shows where you sit on the ladder and the MET thresholds ahead — not another history view.</p>
+            </div>
+            <button onclick="openBandsPopup()" type="button" class="btn-bands-all">View all bands<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          </div>
+
+          <!-- Ladder: band letters + status (no months or attempt scores — those live in the table) -->
+          <div class="band-prog-track">
+            <div class="band-prog-line"></div>
+            <div class="band-prog-line-fill"></div>
+
+            <div class="band-node">
+              <div class="band-node-circle bnode-done">F</div>
+              <div class="band-node-lbl" style="color:var(--red)">Completed</div>
+            </div>
+
+            <div class="band-node skip">
+              <div class="band-node-circle bnode-skip">E</div>
+              <div class="band-node-lbl" style="color:var(--text3);opacity:.5">Skipped</div>
+            </div>
+
+            <div class="band-node">
+              <div style="position:relative">
+                <div class="band-node-circle bnode-active">D</div>
+                <div class="band-node-badge">
+                  <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                </div>
+              </div>
+              <div class="band-node-lbl" style="color:var(--purple)">You are here</div>
+            </div>
+
+            <div class="band-node">
+              <div class="band-node-circle bnode-next">C</div>
+              <div class="band-node-lbl" style="color:var(--amber)">Next</div>
+              <div class="band-node-sub">MET ≥75</div>
+            </div>
+
+            <div class="band-node">
+              <div class="band-node-circle bnode-locked">B</div>
+              <div class="band-node-lbl" style="color:var(--text3)">Locked</div>
+              <div class="band-node-sub">MET ≥85</div>
+            </div>
+
+            <div class="band-node">
+              <div class="band-node-circle bnode-locked">A</div>
+              <div class="band-node-lbl" style="color:var(--text3)">Locked</div>
+              <div class="band-node-sub">MET ≥92</div>
+            </div>
+          </div>
+
+          <!-- Score progress bar toward next band -->
+          <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px 14px;margin-bottom:1rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <span style="font-size:12px;font-weight:500;color:var(--text)">Progress to Band C</span>
+              <span style="font-size:12px;font-weight:500;color:var(--purple)">67.4 / 75</span>
+            </div>
+            <div style="height:8px;background:var(--border-h);border-radius:99px;overflow:hidden;">
+              <div
+                style="height:100%;width:89.8%;background:linear-gradient(90deg,var(--purple-mid),var(--purple));border-radius:99px;transition:width .8s ease;">
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+              <span style="font-size:11px;color:var(--text3)">Band D threshold: 55</span>
+              <span style="font-size:11px;color:var(--amber);font-weight:500;">8 points to go</span>
+            </div>
+          </div>
+
+          <!-- Nudge -->
+          <div
+            style="padding:.875rem 1rem;background:var(--amber-lt);border-radius:var(--r-md);display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
+              <path d="M8 2l1.6 4.9H15l-4.1 3 1.5 4.8L8 12l-4.4 2.7 1.5-4.8L1 7h5.4z" fill="#EF9F27" />
+            </svg>
+            <span style="flex:1;font-size:12px;color:var(--amber)"><strong style="font-weight:500">Band C</strong>
+              unlocks Wipro Elite, IBM &amp; Capgemini shortlists (points to go are in the bar above).</span>
+            <a href="#"
+              style="font-size:12px;color:var(--amber);font-weight:500;white-space:nowrap;border:1px solid var(--amber-mid);padding:5px 12px;border-radius:var(--r-md);flex-shrink:0;display:inline-flex;align-items:center">Take
+              MET<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /main -->
+
+    <!-- ── Bands popup ── -->
+    <div class="popup-overlay" id="bands-popup" onclick="if(event.target===this)closeBandsPopup()">
+      <div class="popup-box">
+        <div class="popup-hdr">
+          <div class="popup-title">All employability bands</div>
+          <button class="popup-close" onclick="closeBandsPopup()">×</button>
+        </div>
+        <div class="popup-body">
+
+          <div class="popup-band-group">
+            <div class="popup-band-row" style="opacity:.55">
+              <div class="popup-band-circle" style="background:var(--red-lt);color:var(--red);border:2px solid #E24B4A">F</div>
+              <div class="popup-band-info">
+                <div class="popup-band-name">Band F</div>
+                <div class="popup-band-range">Up to 3 LPA</div>
+                <div class="popup-band-score">MET score below 40</div>
+              </div>
+              <span class="popup-band-tag" style="background:var(--red-lt);color:var(--red)">Completed</span>
+            </div>
+
+            <div class="popup-band-row" style="opacity:.55">
+              <div class="popup-band-circle"
+                style="background:var(--red-lt);color:var(--red);border:1.5px dashed #E24B4A">E</div>
+              <div class="popup-band-info">
+                <div class="popup-band-name">Band E</div>
+                <div class="popup-band-range">3 – 4 LPA</div>
+                <div class="popup-band-score">MET score 40 – 54</div>
+              </div>
+              <span class="popup-band-tag" style="background:var(--surface2);color:var(--text3)">Skipped</span>
+            </div>
+
+            <div class="popup-band-row popup-band-current">
+              <div class="popup-band-circle">D</div>
+              <div class="popup-band-info">
+                <div class="popup-band-name">Band D <span style="font-size:11px;color:var(--purple-mid);margin-left:4px;white-space:nowrap">· You are here</span></div>
+                <div class="popup-band-range">4 – 5 LPA</div>
+                <div class="popup-band-score">MET score 55 – 74 · Your score: 67.4</div>
+              </div>
+              <span class="popup-band-tag" style="background:var(--purple-lt);color:var(--purple-dk)">Current</span>
+            </div>
+
+            <div class="popup-band-row">
+              <div class="popup-band-circle"
+                style="background:var(--amber-lt);color:var(--amber);border:1.5px dashed var(--amber-mid)">C</div>
+              <div class="popup-band-info">
+                <div class="popup-band-name">Band C <span style="font-size:11px;color:var(--amber);margin-left:4px;white-space:nowrap">· Next target</span></div>
+                <div class="popup-band-range">5 – 7 LPA</div>
+                <div class="popup-band-score">MET score 75 – 84 · Need 8 more points</div>
+              </div>
+              <span class="popup-band-tag" style="background:var(--amber-lt);color:var(--amber)">+8 pts</span>
+            </div>
+
+            <div class="popup-band-row" style="opacity:.5">
+              <div class="popup-band-circle"
+                style="background:var(--purple-lt);color:var(--purple-dk);border:1.5px dashed var(--purple-mid)">B</div>
+              <div class="popup-band-info">
+                <div class="popup-band-name">Band B</div>
+                <div class="popup-band-range">7 – 10 LPA</div>
+                <div class="popup-band-score">MET score 85 – 91</div>
+              </div>
+              <span class="popup-band-tag" style="background:var(--surface2);color:var(--text3)">Locked</span>
+            </div>
+
+            <div class="popup-band-row" style="opacity:.5">
+              <div class="popup-band-circle"
+                style="background:var(--green-lt);color:var(--green);border:1.5px dashed var(--green-mid)">A</div>
+              <div class="popup-band-info">
+                <div class="popup-band-name">Band A</div>
+                <div class="popup-band-range">10+ LPA</div>
+                <div class="popup-band-score">MET score 92+</div>
+              </div>
+              <span class="popup-band-tag" style="background:var(--surface2);color:var(--text3)">Locked</span>
+            </div>
+          </div>
+
+          <div class="popup-band-nudge">
+            <span style="font-size:12px;color:var(--amber);line-height:1.45">Score 75+ on your next MET to reach Band C and unlock Wipro Elite &amp; IBM.</span>
+            <a href="#"
+              style="font-size:12px;font-weight:500;color:var(--amber);white-space:nowrap;border:1px solid var(--amber-mid);padding:6px 12px;border-radius:var(--r-md);display:inline-flex;align-items:center;flex-shrink:0">Take MET<span class="ic-chev" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Mobile bottom nav ── -->
+    <nav class="mobile-nav">
+      <div class="mnav-item active">
+        <svg class="mnav-icon" viewBox="0 0 20 20" fill="none">
+          <rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor" />
+          <rect x="12" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4" />
+          <rect x="1" y="12" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4" />
+          <rect x="12" y="12" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4" />
+        </svg>
+        Home
+      </div>
+      <div class="mnav-item" onclick="window.location='#'">
+        <svg class="mnav-icon" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
+          <path d="M7 10l2.5 2.5 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        Practice
+      </div>
+      <div class="mnav-item" onclick="window.location='jobs.html'">
+        <svg class="mnav-icon" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="6" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5" />
+          <path d="M6 6V5a4 4 0 018 0v1" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        Jobs
+      </div>
+      <div class="mnav-item" onclick="window.location='report-card.html'">
+        <svg class="mnav-icon" viewBox="0 0 20 20" fill="none">
+          <rect x="4" y="2" width="12" height="16" rx="2" stroke="currentColor" stroke-width="1.5" />
+          <path d="M7 7h6M7 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+        </svg>
+        Report
+      </div>
+      <div class="mnav-item">
+        <svg class="mnav-icon" viewBox="0 0 20 20" fill="none">
+          <circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.5" />
+          <path d="M2 18c0-3 2.686-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          <path d="M14 7l2 2 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+        </svg>
+        Interview
+      </div>
+    </nav>
+  </div><!-- /layout -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script>
+    /* Heatmap — realistic activity pattern + year filter */
+    const hm = document.getElementById('heatmap');
+    function hmPad364(arr) {
+      const a = arr.slice();
+      while (a.length < 364) a.push(0);
+      return a.slice(0, 364);
+    }
+    const hmActivityRaw = [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Sep (inactive)
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Oct (inactive)
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Nov (inactive)
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Dec (inactive)
+      // Jan — first MET prep burst
+      0, 1, 2, 1, 0, 2, 3, 1, 0, 2, 2, 1, 3, 2, 0, 1, 1, 2, 3, 2, 1, 1, 2, 1, 0, 2, 1, 2,
+      // Feb — absent month, low activity
+      0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0,
+      // Mar — active prep for second MET
+      2, 3, 2, 1, 3, 3, 2, 1, 2, 3, 2, 3, 1, 2, 3, 2, 1, 3, 2, 1, 3, 2, 3, 2, 1, 0, 0, 0,
+    ];
+    const hm2026 = hmPad364(hmActivityRaw);
+    const hm2025 = hm2026.map(function (v) { return v === 0 ? 0 : Math.max(0, v - 1); });
+    const hm2024 = hm2026.map(function (v) { return v < 2 ? 0 : v - 2; });
+    const HM_BY_YEAR = { 2024: hm2024, 2025: hm2025, 2026: hm2026 };
+    function buildHeatmapMonthRow() {
+      var el = document.getElementById('heatmap-months');
+      if (!el) return;
+      el.innerHTML = '';
+      var spans = [4, 4, 5, 4, 4, 5, 4, 5, 4, 4, 5, 4];
+      var names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      spans.forEach(function (span, i) {
+        var s = document.createElement('span');
+        s.textContent = names[i];
+        s.style.gridColumn = 'span ' + span;
+        el.appendChild(s);
+      });
+    }
+    buildHeatmapMonthRow();
+    function renderHeatmap(year) {
+      if (!hm) return;
+      var data = HM_BY_YEAR[year] || hm2026;
+      hm.innerHTML = '';
+      for (var i = 0; i < 364; i++) {
+        var d = document.createElement('div');
+        var v = data[i] || 0;
+        d.className = 'hcell' + (v === 1 ? ' l1' : v === 2 ? ' l2' : v === 3 ? ' l3' : '');
+        hm.appendChild(d);
+      }
+    }
+    renderHeatmap(2026);
+    document.querySelectorAll('.heatmap-year').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var y = +btn.getAttribute('data-year');
+        document.querySelectorAll('.heatmap-year').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        renderHeatmap(y);
+      });
+    });
+
+    /* Challenge of the day */
+    const _s = {}, _a = {};
+    function markSolved(cat) {
+      _a[cat] = (_a[cat] || 0) + 1;
+      document.getElementById(cat + '-attempts').textContent = _a[cat];
+      if (!_s[cat]) {
+        _s[cat] = true;
+        document.getElementById('cotd-' + cat + '-btn').outerHTML =
+          `<div class="cotd-done"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Solved</div>`;
+      }
+    }
+
+    /* Question stats */
+    const QD = {
+      all: { coding: [187, 98, 27], aptitude: [143, 61, 12], verbal: [89, 34, 8] },
+      week: { coding: [18, 9, 3], aptitude: [12, 5, 1], verbal: [7, 3, 0] },
+      today: { coding: [4, 2, 0], aptitude: [3, 1, 0], verbal: [2, 0, 0] },
+    };
+    const QT = { coding: [1800, 2161, 1200], aptitude: [1200, 1100, 700], verbal: [800, 800, 400] };
+    const QP = { coding: 'coding', aptitude: 'apt', verbal: 'verbal' };
+    function switchQTab(el, tab) {
+      document.querySelectorAll('.qtab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      ['coding', 'aptitude', 'verbal'].forEach(c => renderQ(c, QD[tab][c]));
+    }
+    function renderQ(cat, vals) {
+      const p = QP[cat], t = QT[cat];
+      document.getElementById(cat + '-solved').textContent = vals[0] + vals[1] + vals[2];
+      ['easy', 'med', 'hard'].forEach((d, i) => {
+        const pct = t[i] ? Math.round(vals[i] / t[i] * 100) : 0;
+        document.getElementById(p + '-' + d + '-bar').style.width = pct + '%';
+        document.getElementById(p + '-' + d + '-count').textContent = vals[i] + ' / ' + t[i];
+      });
+    }
+    ['coding', 'aptitude', 'verbal'].forEach(c => renderQ(c, QD.all[c]));
+
+    /* Hours chart */
+    const L7 = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], L30 = ['W1', 'W2', 'W3', 'W4'], LA = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+    const D7 = [0.5, 1.2, 0, 2.1, 1.8, 3.0, 1.5], D30 = [4.2, 6.8, 5.1, 9.4], DA = [0, 0, 0, 0, 6.5, 8.2, 12.7];
+    const hChart = new Chart(document.getElementById('hoursChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: L7, datasets: [{
+          data: D7, borderColor: '#534AB7', borderWidth: 2, pointBackgroundColor: '#534AB7', pointBorderColor: '#fbfaff', pointBorderWidth: 2, pointRadius: 4, tension: 0.4, fill: true,
+          backgroundColor: ctx => { const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 110); g.addColorStop(0, 'rgba(83,74,183,.15)'); g.addColorStop(1, 'rgba(83,74,183,0)'); return g; }
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: '#f4effc', titleColor: '#1a1830', bodyColor: '#5c5878', borderColor: 'rgba(83,74,183,.15)', borderWidth: 1, padding: 8, callbacks: { label: c => c.parsed.y + 'h spent' } } },
+        scales: {
+          x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 11, family: 'DM Sans' }, color: '#8b879e' } },
+          y: { min: 0, grid: { color: 'rgba(83,74,183,.08)' }, border: { display: false }, ticks: { font: { size: 11, family: 'DM Sans' }, color: '#8b879e', maxTicksLimit: 4, callback: v => v + 'h' } }
+        }
+      }
+    });
+    function setRange(el, r) {
+      document.querySelectorAll('.lm-range').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      const m = { '7d': [L7, D7], '30d': [L30, D30], 'all': [LA, DA] };
+      hChart.data.labels = m[r][0]; hChart.data.datasets[0].data = m[r][1]; hChart.update();
+    }
+
+    /* Course donut */
+    new Chart(document.getElementById('courseDonut').getContext('2d'), {
+      type: 'doughnut', data: { datasets: [{ data: [1, 2], backgroundColor: ['#639922', '#EF9F27'], borderWidth: 0 }] },
+      options: { cutout: '72%', responsive: false, plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+    });
+
+    /* Attention arc */
+    (function () {
+      const arc = 107, pct = 78, offset = arc - (pct / 100) * arc;
+      document.getElementById('attn-arc').setAttribute('stroke-dashoffset', offset);
+      document.getElementById('attn-pct').textContent = pct + '%';
+      document.getElementById('attn-label').textContent = 'Highly focused';
+    })();
+
+    /* Practice — questions solved center count (3s, matches arc animation) */
+    (function () {
+      const el = document.getElementById('solve-gauge-num');
+      if (!el) return;
+      const target = 312, dur = 3000, t0 = performance.now();
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+      function frame(now) {
+        const u = Math.min(1, (now - t0) / dur);
+        el.textContent = String(Math.round(easeOutCubic(u) * target));
+        if (u < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    /* Report card */
+    const RC_M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    let rcY = 2026, rcT = 'met';
+    const RCD = {
+      met: {
+        2026: {
+          rows: [
+            { label: 'Aptitude', bg: '#FAEEDA', color: '#854F0B', key: 'apt' },
+            { label: 'Coding', bg: '#EEEDFE', color: '#3C3489', key: 'cod' },
+            { label: 'English', bg: '#E1F5EE', color: '#0F6E56', key: 'eng' },
+            { label: 'Employability Score', bg: '#E6F1FB', color: '#0C447C', key: 'emp' },
+            { label: 'Employability Band', bg: '#EEEDFE', color: '#3C3489', key: 'band' },
+            { label: 'State Rank', bg: '#EAF3DE', color: '#3B6D11', key: 'sr' },
+            { label: 'College Rank', bg: '#EAF3DE', color: '#3B6D11', key: 'cr' },
+          ],
+          vals: {
+            apt: ['38', 'AB', '58', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            cod: ['75', 'AB', '82', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            eng: ['62', 'AB', '71', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            emp: ['33', 'NA', '67', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            band: ['F', 'NA', 'D', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            sr: ['832', 'NA', '216', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            cr: ['3', 'NA', '1', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+          }
+        }
+      },
+      coding: {
+        2026: {
+          rows: [{ label: 'C', bg: '#E6F1FB', color: '#0C447C', key: 'c' }, { label: 'C++', bg: '#FAEEDA', color: '#633806', key: 'cpp' }, { label: 'Python', bg: '#E1F5EE', color: '#085041', key: 'py' }, { label: 'Java', bg: '#FCEBEB', color: '#791F1F', key: 'java' }],
+          vals: {
+            c: ['1', 'AB', '4', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            cpp: ['0', 'AB', '0', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            py: ['2', 'AB', '8', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+            java: ['0', 'AB', '0', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+          }
+        }
+      }
+    };
+    function rcCls(v, key) {
+      if (v === '-') return 'v-dash'; if (v === 'NA') return 'v-na'; if (v === 'AB') return 'v-ab';
+      if (key === 'band') { const m = { F: 'v-band-f', D: 'v-band-d', C: 'v-band-c', A: 'v-band-a' }; return m[v] || 'v-present'; }
+      if (key === 'cr' && v === '1') return 'v-good';
+      return 'v-present';
+    }
+    function rcRender() {
+      const d = RCD[rcT][rcY];
+      const head = document.getElementById('rc-head'), body = document.getElementById('rc-body');
+      if (!d) { body.innerHTML = `<tr><td colspan="13" style="padding:2rem;text-align:center;color:var(--text3)">No data for ${rcY}</td></tr>`; return; }
+      head.innerHTML = `<th class="cc">Category</th>` + RC_M.map((m, i) => {
+        const cur = rcY === 2026 && i === 2;
+        return `<th class="${cur ? 'cm' : ''}">${m}<span class="month-sub">26</span></th>`;
+      }).join('');
+      body.innerHTML = d.rows.map(row => {
+        const cells = d.vals[row.key].map((v, i) => {
+          const cur = rcY === 2026 && i === 2;
+          const cls = rcCls(v, row.key);
+          const inner = v === '-' ? '—' : (row.key === 'band' ? `<span class="rc-band-cell ${cls}">${v}</span>` : v);
+          const tdCls = row.key === 'band' ? `rc-cell-band${cur ? ' v-cur' : ''}` : `${cls}${cur ? ' v-cur' : ''}`;
+          return `<td class="${tdCls}">${inner}</td>`;
+        }).join('');
+        return `<tr><td class="cc"><span class="rc-pill" style="background:${row.bg};color:${row.color}">${row.label}</span></td>${cells}</tr>`;
+      }).join('');
+    }
+    function rcTab(t) {
+      rcT = t;
+      document.getElementById('rc-tab-met').classList.toggle('active', t === 'met');
+      document.getElementById('rc-tab-coding').classList.toggle('active', t === 'coding');
+      rcRender();
+    }
+    function rcYear(d) { rcY += d; document.getElementById('rc-yr').textContent = rcY; rcRender(); }
+    rcRender();
+
+    /* Bands popup */
+    function openBandsPopup() { document.getElementById('bands-popup').classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeBandsPopup() { document.getElementById('bands-popup').classList.remove('open'); document.body.style.overflow = ''; }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBandsPopup(); });
+
+    /* Smart Interview — claim credit toggle (persisted) */
+    var SI_CREDIT_KEY = 'taptap_si_credit_claimed';
+    function claimSiCredit() {
+      try { localStorage.setItem(SI_CREDIT_KEY, '1'); } catch (err) { }
+      var c = document.getElementById('si-state-claim');
+      var a = document.getElementById('si-state-active');
+      if (c) c.hidden = true;
+      if (a) a.hidden = false;
+    }
+    function initSiCard() {
+      try {
+        if (localStorage.getItem(SI_CREDIT_KEY) === '1') {
+          var c = document.getElementById('si-state-claim');
+          var a = document.getElementById('si-state-active');
+          if (c) c.hidden = true;
+          if (a) a.hidden = false;
+        }
+      } catch (err) { }
+    }
+    initSiCard();
+
+    /* MET UI: none | due | ok — dashboard2 defaults to ok (user has taken MET). Preview: #met-none #met-due #met-ok */
+    var MET_STATE_KEY = 'taptap_met_state_d2';
+    function setMetState(state) {
+      var n = document.getElementById('met-act-panel-none');
+      var d = document.getElementById('met-act-panel-due');
+      var cn = document.getElementById('met-card-panel-none');
+      var cd = document.getElementById('met-card-panel-due');
+      var co = document.getElementById('met-card-panel-ok');
+      var metRoot = document.getElementById('dash-act-met-root');
+      var pill = document.getElementById('score-pill-met');
+      var dot = document.getElementById('score-pill-dot');
+      var lbl = document.getElementById('score-pill-label');
+      if (!pill) return;
+      [n, d, cn, cd, co].forEach(function (el) { if (el) el.hidden = true; });
+      if (state === 'due') {
+        if (d) d.hidden = false;
+        if (cd) cd.hidden = false;
+        if (metRoot) metRoot.hidden = false;
+        pill.className = 'score-pill score-pill--met-due';
+        if (dot) dot.className = 'score-dot score-dot--amber';
+        if (lbl) lbl.textContent = 'MET due · Last 67.4';
+      } else if (state === 'ok') {
+        if (co) co.hidden = false;
+        if (metRoot) metRoot.hidden = true;
+        pill.className = 'score-pill score-pill--met-ok';
+        if (dot) dot.className = 'score-dot';
+        if (lbl) lbl.textContent = 'Best MET: 71.2 · Band D';
+      } else {
+        if (n) n.hidden = false;
+        if (cn) cn.hidden = false;
+        if (metRoot) metRoot.hidden = false;
+        pill.className = 'score-pill score-pill--met-none';
+        if (dot) dot.className = 'score-dot score-dot--muted';
+        if (lbl) lbl.textContent = 'No MET yet';
+      }
+      try { localStorage.setItem(MET_STATE_KEY, state); } catch (err) { }
+    }
+    function initMetUi() {
+      var state = 'ok';
+      try {
+        var h = (location.hash || '').toLowerCase();
+        if (h === '#met-due') state = 'due';
+        else if (h === '#met-ok') state = 'ok';
+        else if (h === '#met-none') state = 'none';
+        else {
+          var s = localStorage.getItem(MET_STATE_KEY);
+          if (s === 'due' || s === 'ok' || s === 'none') state = s;
+        }
+      } catch (err) { }
+      setMetState(state);
+    }
+    initMetUi();
+  </script>
+</body>
+
+</html>

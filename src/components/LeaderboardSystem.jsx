@@ -24,8 +24,8 @@ const LeaderboardSystem = ({ user }) => {
           style={{
             width: 36, height: 36, 
             borderRadius: '50%', 
-            background: isOpen ? '#4c1d95' : '#2c2c2c', // Purple when active
-            color: isOpen ? '#fff' : '#ccc',
+            background: isOpen ? '#8b5cf6' : 'rgba(255,255,255,0.05)', // Purple when active
+            color: '#ffffff',
             display: 'flex', alignItems: 'center', justifyContent: 'center', 
             cursor: 'pointer',
             transition: 'all 0.2s',

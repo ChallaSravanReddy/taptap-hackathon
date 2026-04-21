@@ -28,128 +28,132 @@ const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children 
 
   const initial = user?.handle ? user.handle.charAt(0).toUpperCase() : 'U';
 
+  // Dashboard2-style color tokens
+  const purple = '#7C3AED';
+  const purpleLt = 'rgba(124, 58, 237, 0.1)';
+  const purpleMid = '#8B5CF6';
+  const purpleDk = '#EDE9FE';
+  const border = 'rgba(255, 255, 255, 0.08)';
+  const text2 = '#94a3b8';
+  const text3 = '#64748b';
+  const blackBg = '#000000';
+  const darkNavBg = '#0a0a0a';
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f5f5', color: '#333', fontFamily: 'sans-serif', position: 'relative', overflowX: 'hidden' }}>
+    <div style={{
+      display: 'flex', minHeight: '100vh',
+      background: 'radial-gradient(ellipse 120% 70% at 100% -10%,rgba(108,92,231,.18) 0%,transparent 52%),radial-gradient(ellipse 90% 55% at 0% 105%,rgba(232,93,76,.12) 0%,transparent 48%),linear-gradient(165deg,#e4dff5 0%,#ebe7f6 35%,#f0ecf8 100%)',
+      color: '#1a1830', fontFamily: "'DM Sans', sans-serif", position: 'relative', overflowX: 'hidden'
+    }}>
       
       {/* ── SIDEBAR ── */}
       <div style={{ 
-        width: '260px', 
-        background: '#0a0a0a', 
-        color: '#fff', 
+        width: '200px', 
+        background: darkNavBg,
+        borderRight: `1px solid ${border}`,
         display: 'flex', 
         flexDirection: 'column',
         position: 'fixed',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        zIndex: 50
+        left: 0, top: 0, bottom: 0,
+        zIndex: 50,
+        boxShadow: '4px 0 24px rgba(0,0,0,.3)',
+        padding: '1.25rem 0',
+        gap: 2,
+        overflowY: 'auto',
       }}>
-        {/* Logo Section */}
-        <div style={{ padding: '24px 20px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#00f0ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src="https://i.ibb.co/VvzM47y/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', filter: 'hue-rotate(90deg)' }} onError={(e) => e.target.style.display='none'} />
-          </div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: '1.2rem', letterSpacing: '0.5px' }}>TapTaP</div>
-            <div style={{ fontSize: '0.8rem', color: '#999' }}>by Blackbucks</div>
-          </div>
+        {/* Logo */}
+        <div style={{ padding: '0 1rem 1rem', borderBottom: `1px solid ${border}`, marginBottom: '.5rem' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#ffffff', letterSpacing: '0.05em' }}>TaPTaP</div>
+          <div style={{ fontSize: 10, color: text3, fontWeight: 500 }}>by Blackbucks</div>
         </div>
 
+        {/* Nav sections */}
+        <div style={{ fontSize: 10, color: text3, padding: '8px 1rem 4px', letterSpacing: '.06em', textTransform: 'uppercase' }}>Main</div>
         {/* Navigation */}
-        <div style={{ padding: '20px 10px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
-          {navItems.map(item => {
+        {navItems.map(item => {
             const isActive = activeTab === item.label;
             return (
               <div 
                 key={item.label}
                 onClick={() => onTabChange && onTabChange(item.label)}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  background: isActive ? '#2c2c2c' : 'transparent',
-                  color: isActive ? '#fff' : '#aaa',
-                  cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '8px 1rem', fontSize: 13,
+                  color: isActive ? '#ffffff' : text2,
+                  borderLeft: isActive ? `3px solid ${purpleMid}` : '3px solid transparent',
+                  background: isActive ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
                   fontWeight: isActive ? 600 : 400,
-                  transition: 'all 0.2s',
+                  cursor: 'pointer',
+                  transition: 'all .2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  if(!isActive) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }
+                  if(!isActive) { 
+                    e.currentTarget.style.background = 'rgba(255,255,255,.03)'; 
+                    e.currentTarget.style.color = '#ffffff'; 
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  if(!isActive) { e.currentTarget.style.color = '#aaa'; e.currentTarget.style.background = 'transparent'; }
+                  if(!isActive) { 
+                    e.currentTarget.style.background = 'transparent'; 
+                    e.currentTarget.style.color = text2; 
+                  }
                 }}
               >
-                {item.icon}
-                <span style={{ fontSize: '0.9rem' }}>{item.label}</span>
+                <span style={{ opacity: isActive ? 1 : 0.6, flexShrink: 0, display: 'flex' }}>{item.icon}</span>
+                <span>{item.label}</span>
               </div>
             );
           })}
-        </div>
       </div>
 
       {/* ── MAIN CONTENT AREA ── */}
-      <div style={{ flex: 1, marginLeft: '260px', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, marginLeft: '200px', display: 'flex', flexDirection: 'column' }}>
         
         {/* TOPBAR */}
         <div style={{ 
-          height: '70px', 
-          background: '#0a0a0a', 
-          borderBottom: '1px solid #ddd',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 30px',
-          color: '#fff',
-          position: 'sticky',
-          top: 0,
-          zIndex: 40
+          background: blackBg,
+          borderBottom: `1px solid ${border}`,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          padding: '0 1.5rem',
+          height: 56,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          position: 'sticky', top: 0, zIndex: 40,
         }}>
-          
-          {/* Left Side */}
-          <div style={{ display: 'flex', gap: '15px' }}>
-            <div style={{ background: '#333', padding: '6px 16px', borderRadius: '20px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              🔥 Streak 0
+          {/* Left */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: '#ffffff' }}>{activeTab}</span>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              background: 'rgba(255,255,255,0.05)', border: `1px solid ${border}`,
+              borderRadius: 99, padding: '4px 14px', fontSize: 12, fontWeight: 500, color: '#e2e8f0',
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', flexShrink: 0 }} />
+              Best MET: 71.2 · Band D
             </div>
           </div>
 
-          {/* Right Side: Tools, Leaderboard, Notifications, Profile */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Dev Code Icon */}
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#2c2c2c', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              <Code size={16} />
-            </div>
-
-            {/* Leaderboard System */}
+          {/* Right */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <LeaderboardSystem user={user} />
-
-            {/* Notification System */}
             <NotificationSystem user={user} />
-
-            {/* Profile Info - Now Clickable */}
             <div 
-              style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '10px', cursor: 'pointer', padding: '4px', borderRadius: '8px', transition: 'background 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
               onClick={() => onTabChange && onTabChange('Profile')}
             >
-              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f43f5e', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold' }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: '50%',
+                background: purpleMid, color: '#ffffff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 13, fontWeight: 600, border: '2px solid rgba(255,255,255,0.1)'
+              }}>
                 {initial}
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{user?.handle || 'User'}</span>
-                <span style={{ fontSize: '0.75rem', color: '#aaa', maxWidth: '150px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {user?.college || 'Unknown College'}
-                </span>
               </div>
             </div>
           </div>
         </div>
 
         {/* PAGE CONTENT */}
-        <div style={{ padding: activeTab === 'Prepare' ? 0 : '30px', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: activeTab === 'Prepare' ? 0 : '1.5rem', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>
       </div>
