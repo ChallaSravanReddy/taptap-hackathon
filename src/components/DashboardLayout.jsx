@@ -9,17 +9,17 @@ import LeaderboardSystem from './LeaderboardSystem';
 const DashboardLayout = ({ user, activeTab = 'Dashboard', onTabChange, children }) => {
   // Navigation Menu matching the TapTap side menu style
   const navItems = [
-    { label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
-    { label: 'Socials', icon: <MessageSquare size={18} /> },
-    { label: 'Learn', icon: <BookOpen size={18} /> },
-    { label: 'Employability Track', icon: <Target size={18} /> },
-    { label: 'Prepare', icon: <CheckSquare size={18} /> },
-    { label: 'Games', icon: <Gamepad2 size={18} /> },
-    { label: 'Assess', icon: <Briefcase size={18} /> },
-    { label: 'Job Posts', icon: <Briefcase size={18} /> },
-    { label: 'Study Abroad', icon: <Globe size={18} /> },
-    { label: 'My College', icon: <GraduationCap size={18} /> },
-    { label: 'Support', icon: <LifeBuoy size={18} /> },
+    { label: 'Dashboard', icon: <LayoutDashboard size={18} color="#3b82f6" /> },
+    { label: 'Socials', icon: <MessageSquare size={18} color="#06b6d4" /> },
+    { label: 'Learn', icon: <BookOpen size={18} color="#f59e0b" /> },
+    { label: 'Employability Track', icon: <Target size={18} color="#10b981" /> },
+    { label: 'Prepare', icon: <CheckSquare size={18} color="#6366f1" /> },
+    { label: 'Games', icon: <Gamepad2 size={18} color="#f43f5e" /> },
+    { label: 'Assess', icon: <Briefcase size={18} color="#d97706" /> },
+    { label: 'Job Posts', icon: <Briefcase size={18} color="#0d9488" /> },
+    { label: 'Study Abroad', icon: <Globe size={18} color="#38bdf8" /> },
+    { label: 'My College', icon: <GraduationCap size={18} color="#8b5cf6" /> },
+    { label: 'Support', icon: <LifeBuoy size={18} color="#ec4899" /> },
   ];
 
   if (user?.role === 'Admin') {

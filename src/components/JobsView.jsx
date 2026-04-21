@@ -123,7 +123,7 @@ const JobsView = () => {
             <Briefcase size={40} />
          </div>
          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#111827', margin: '0 0 12px 0' }}>Are you a Recruiter?</h2>
-         <p style={{ margin: '0 0 24px 0', color: '#64748b', fontSize: '1.1rem', maxWidth: '500px', margin: '0 auto 32px' }}>Post your job openings and connect with over 50,000+ pre-vetted students from top institutions across India.</p>
+         <p style={{ color: '#64748b', fontSize: '1.1rem', maxWidth: '500px', margin: '0 auto 32px' }}>Post your job openings and connect with over 50,000+ pre-vetted students from top institutions across India.</p>
          <button style={{ background: '#fff', color: '#111827', border: '2px solid #111827', padding: '14px 32px', borderRadius: '14px', fontWeight: 800, cursor: 'pointer' }}>Post a Job</button>
       </div>
 
